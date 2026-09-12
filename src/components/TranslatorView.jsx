@@ -343,13 +343,10 @@ export default function TranslatorView({ onOpenDialogue, isForcedOffline = false
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-school-blue"></span>
             <span className="text-xs font-bold uppercase tracking-wider text-slate-800">
-              {currentSourceObj.name} <span className="text-slate-400 font-normal">({currentSourceObj.description})</span>
+              {currentSourceObj.name}
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-mono tabular-nums font-semibold px-2 py-0.5 rounded-md bg-slate-100/80 text-slate-500 border border-slate-200/60">
-              {sourceText.length} Zeichen
-            </span>
             {sourceText && (
               <button
                 onClick={() => {
