@@ -1,4 +1,28 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { 
+  ArrowLeftRight, 
+  Sparkles, 
+  Mic, 
+  Square, 
+  Volume2, 
+  Copy, 
+  Check, 
+  RotateCcw, 
+  Maximize2, 
+  Minimize2, 
+  X, 
+  Zap, 
+  Bookmark, 
+  Share2, 
+  GraduationCap, 
+  Users, 
+  CheckCircle2, 
+  ChevronDown, 
+  BookOpen,
+  ArrowRight,
+  MessageSquare,
+  Lightbulb
+} from 'lucide-react';
 import { SUPPORTED_LANGUAGES, FREQUENT_PAIRS, getLanguage } from '../data/languages';
 import { translationManager } from '../services/translationManager';
 import { speechService } from '../services/speechService';
@@ -218,12 +242,12 @@ export default function TranslatorView({ onOpenDialogue, isForcedOffline = false
   return (
     <div className="flex flex-col w-full max-w-4xl mx-auto px-4 pt-20 pb-28 gap-4">
       {/* 1. Context Chips Carousel */}
-      <div className="flex items-center gap-2 overflow-x-auto py-1 no-scrollbar -mx-4 px-4">
+      <div className="flex flex-wrap gap-1.5 py-0.5">
         {CONTEXT_TEMPLATES.map((item) => (
           <button
             key={item.label}
             onClick={() => setSourceText(item.text)}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white text-slate-700 border border-school-blue/20 text-xs font-semibold whitespace-nowrap shadow-xs hover:border-school-blue active:scale-95 transition-all shrink-0"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/80 text-slate-700 border border-slate-200/80 text-xs font-semibold shadow-2xs hover:border-school-blue/40 hover:bg-school-blue/5 active:scale-[0.98] transition-all"
           >
             <span>{item.icon}</span>
             <span>{item.label}</span>
@@ -231,14 +255,14 @@ export default function TranslatorView({ onOpenDialogue, isForcedOffline = false
         ))}
       </div>
 
-      {/* 2. Language Selector Bar */}
-      <div className="bg-white rounded-2xl p-2.5 shadow-sm border border-school-border flex items-center justify-between gap-2">
-        {/* Source Language Button / Dropdown */}
+      {/* 2. Language Selector Bar (Linear / Vercel Segmented Control) */}
+      <div className="bg-white/90 backdrop-blur-md rounded-2xl p-2 shadow-[0_1px_3px_rgba(0,0,0,0.03),0_6px_16px_-6px_rgba(11,123,167,0.04)] border border-slate-200/80 flex items-center justify-between gap-2">
+        {/* Source Language Dropdown */}
         <div className="relative flex-1">
           <select
             value={sourceLang}
             onChange={(e) => setSourceLang(e.target.value)}
-            className="w-full h-11 pl-3 pr-8 rounded-xl bg-school-blue/10 border border-school-blue/25 text-school-blue text-sm font-bold appearance-none cursor-pointer focus:outline-none"
+            className="w-full h-10 pl-3 pr-8 rounded-xl bg-slate-50/80 border border-slate-200/70 hover:border-slate-300 text-slate-800 text-sm font-bold appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-school-blue/20 transition-all"
           >
             {SUPPORTED_LANGUAGES.map((l) => (
               <option key={l.code} value={l.code}>
@@ -246,28 +270,24 @@ export default function TranslatorView({ onOpenDialogue, isForcedOffline = false
               </option>
             ))}
           </select>
-          <span className="material-symbols-outlined absolute right-2 top-3 text-school-blue pointer-events-none text-[18px]">
-            expand_more
-          </span>
+          <ChevronDown className="w-4 h-4 text-slate-400 absolute right-2.5 top-3 pointer-events-none" />
         </div>
 
         {/* Swap Button */}
         <button
           onClick={handleSwapLanguages}
           aria-label="Sprachen tauschen"
-          className="w-10 h-10 rounded-full bg-gradient-to-tr from-school-orange via-amber-500 to-school-teal flex items-center justify-center text-white shadow-sm active:scale-90 transition-transform shrink-0 ring-2 ring-school-orange/20"
+          className="w-9 h-9 rounded-xl bg-white border border-slate-200/80 hover:bg-slate-50 text-slate-600 hover:text-slate-900 shadow-2xs active:scale-[0.92] active:rotate-180 transition-all duration-200 flex items-center justify-center shrink-0"
         >
-          <span className="material-symbols-outlined text-[20px]">
-            swap_horiz
-          </span>
+          <ArrowLeftRight className="w-4 h-4" />
         </button>
 
-        {/* Target Language Button / Dropdown */}
+        {/* Target Language Dropdown */}
         <div className="relative flex-1">
           <select
             value={targetLang}
             onChange={(e) => setTargetLang(e.target.value)}
-            className="w-full h-11 pl-3 pr-8 rounded-xl bg-school-teal/10 border border-school-teal/25 text-school-tealDark text-sm font-bold appearance-none cursor-pointer focus:outline-none"
+            className="w-full h-10 pl-3 pr-8 rounded-xl bg-slate-50/80 border border-slate-200/70 hover:border-slate-300 text-slate-800 text-sm font-bold appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-school-teal/20 transition-all"
           >
             {SUPPORTED_LANGUAGES.map((l) => (
               <option key={l.code} value={l.code}>
@@ -275,18 +295,14 @@ export default function TranslatorView({ onOpenDialogue, isForcedOffline = false
               </option>
             ))}
           </select>
-          <span className="material-symbols-outlined absolute right-2 top-3 text-school-tealDark pointer-events-none text-[18px]">
-            expand_more
-          </span>
+          <ChevronDown className="w-4 h-4 text-slate-400 absolute right-2.5 top-3 pointer-events-none" />
         </div>
       </div>
 
       {/* Quick Frequent Pairs Pill Deck */}
       <div className="flex items-center justify-center gap-1.5 flex-wrap">
-        <span className="text-xs font-bold text-slate-500 flex items-center gap-1 mr-1">
-          <span className="material-symbols-outlined text-[14px] text-school-orange material-symbols-fill">
-            bolt
-          </span>
+        <span className="text-xs font-semibold text-slate-400 flex items-center gap-1 mr-1">
+          <Zap className="w-3.5 h-3.5 text-school-orange" />
           Häufig:
         </span>
         {FREQUENT_PAIRS.map((pair) => {
@@ -298,10 +314,10 @@ export default function TranslatorView({ onOpenDialogue, isForcedOffline = false
                 setSourceLang(pair.source);
                 setTargetLang(pair.target);
               }}
-              className={`px-3 py-1 rounded-full text-xs font-bold transition-all flex items-center gap-1 ${
+              className={`px-3 py-1 rounded-full text-xs font-semibold transition-all active:scale-[0.98] flex items-center gap-1 ${
                 isSelected
-                  ? 'bg-gradient-to-r from-school-blue to-school-teal text-white shadow-xs'
-                  : 'bg-white text-slate-700 border border-school-blue/20 hover:bg-school-blue/10'
+                  ? 'bg-school-blue text-white shadow-xs font-bold'
+                  : 'bg-white/90 text-slate-700 border border-slate-200/80 hover:bg-slate-50 hover:border-slate-300'
               }`}
             >
               <span>{pair.label}</span>
@@ -311,23 +327,23 @@ export default function TranslatorView({ onOpenDialogue, isForcedOffline = false
         })}
       </div>
 
-      {/* 3. Source Input Card */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm flex flex-col gap-3 border border-school-border relative">
+      {/* 3. Source Input Card (Linear Enterprise Surface) */}
+      <div className="bg-white rounded-2xl p-4.5 shadow-[0_1px_3px_rgba(0,0,0,0.03),0_8px_20px_-8px_rgba(11,123,167,0.04)] flex flex-col gap-3 border border-slate-200/80 relative">
         <div className="flex items-center justify-between text-slate-600">
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-school-blue"></span>
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-900">
-              {currentSourceObj.name} ({currentSourceObj.description})
+            <span className="w-2 h-2 rounded-full bg-school-blue"></span>
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-800">
+              {currentSourceObj.name} <span className="text-slate-400 font-normal">({currentSourceObj.description})</span>
             </span>
           </div>
           <div className="flex items-center gap-2">
             {isSpokenInput && (
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1 shadow-2xs">
-                <span className="material-symbols-outlined text-[13px] text-amber-700">mic</span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 border border-amber-500/20 flex items-center gap-1">
+                <Mic className="w-3 h-3 text-amber-600" />
                 KI-Akzent-Filter aktiv
               </span>
             )}
-            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-school-blue/10 text-school-blue border border-school-blue/20">
+            <span className="text-xs font-mono tabular-nums font-semibold px-2 py-0.5 rounded-md bg-slate-100/80 text-slate-500 border border-slate-200/60">
               {sourceText.length} / 500
             </span>
             {sourceText && (
@@ -336,10 +352,10 @@ export default function TranslatorView({ onOpenDialogue, isForcedOffline = false
                   setSourceText('');
                   setIsSpokenInput(false);
                 }}
-                className="w-6 h-6 rounded-full bg-slate-100 hover:bg-school-orange/20 flex items-center justify-center text-slate-600 hover:text-school-orange transition-colors"
+                className="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800 transition-colors active:scale-[0.94]"
                 title="Text löschen"
               >
-                <span className="material-symbols-outlined text-[15px]">close</span>
+                <X className="w-3.5 h-3.5" />
               </button>
             )}
           </div>
@@ -354,20 +370,20 @@ export default function TranslatorView({ onOpenDialogue, isForcedOffline = false
             setSourceText(e.target.value);
           }}
           placeholder={currentSourceObj.placeholder}
-          className="w-full bg-transparent resize-none text-slate-800 text-base focus:outline-none placeholder:text-slate-400 font-medium leading-relaxed"
+          className="w-full bg-transparent resize-none text-slate-900 text-base focus:outline-none placeholder:text-slate-400 font-medium leading-relaxed"
         />
 
         {/* Action Bar */}
-        <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+        <div className="flex items-center justify-between pt-2.5 border-t border-slate-100">
           <div className="flex items-center gap-2">
             {/* Listen Source */}
             <button
               onClick={() => handleSpeak(sourceText, sourceLang)}
               disabled={!sourceText}
-              className="w-10 h-10 rounded-full bg-school-blue/10 hover:bg-school-blue/20 disabled:opacity-40 flex items-center justify-center text-school-blue transition-colors border border-school-blue/20 active:scale-95"
+              className="w-9 h-9 rounded-xl bg-slate-100/80 hover:bg-slate-200/80 disabled:opacity-30 flex items-center justify-center text-slate-700 transition-all border border-slate-200/60 active:scale-[0.96]"
               title="Vorlesen"
             >
-              <span className="material-symbols-outlined text-[20px]">volume_up</span>
+              <Volume2 className="w-4 h-4" />
             </button>
 
             {/* Pedagogical Tone Toggle */}
@@ -377,29 +393,37 @@ export default function TranslatorView({ onOpenDialogue, isForcedOffline = false
                 setPedagogicalTone(nextTone);
                 storageService.saveSettings({ pedagogicalTone: nextTone });
               }}
-              className={`flex items-center gap-1 px-3 h-10 rounded-full text-xs font-bold transition-all border ${
+              className={`flex items-center gap-1.5 px-3 h-9 rounded-xl text-xs font-semibold transition-all border active:scale-[0.98] ${
                 pedagogicalTone === 'parent'
-                  ? 'bg-teal-100 border-teal-300 text-teal-900 shadow-xs'
-                  : 'bg-school-blue/10 border-school-blue/30 text-school-blue hover:bg-school-blue/20'
+                  ? 'bg-teal-500/10 border-teal-500/30 text-teal-800'
+                  : 'bg-school-blue/10 border-school-blue/20 text-school-blue hover:bg-school-blue/15'
               }`}
-              title="Wechselt den pädagogischen Tonfall (Schüler: ermutigend & kindgerecht / Eltern: wertschätzend & höflich)"
+              title="Wechselt den pädagogischen Tonfall"
             >
-              <span>{pedagogicalTone === 'student' ? '🎓 Schüler-Ton' : '🤝 Eltern-Ton'}</span>
+              {pedagogicalTone === 'student' ? (
+                <>
+                  <GraduationCap className="w-3.5 h-3.5" />
+                  <span>Schüler-Ton</span>
+                </>
+              ) : (
+                <>
+                  <Users className="w-3.5 h-3.5" />
+                  <span>Eltern-Ton</span>
+                </>
+              )}
             </button>
 
             {/* Simplified Language Toggle */}
             <button
               onClick={() => setSimplified(!simplified)}
-              className={`flex items-center gap-1 px-3 h-10 rounded-full text-xs font-bold transition-all border ${
+              className={`flex items-center gap-1.5 px-3 h-9 rounded-xl text-xs font-semibold transition-all border active:scale-[0.98] ${
                 simplified
-                  ? 'bg-amber-100 border-amber-300 text-amber-800 shadow-xs'
-                  : 'bg-slate-100 border-slate-200 text-slate-600 hover:bg-slate-200'
+                  ? 'bg-amber-500/15 border-amber-400/40 text-amber-800'
+                  : 'bg-slate-100/80 border-slate-200/60 text-slate-600 hover:bg-slate-200/80'
               }`}
               title="Formuliert in kindgerechte, einfache Sprache um"
             >
-              <span className="material-symbols-outlined text-[18px]">
-                {simplified ? 'auto_awesome' : 'child_care'}
-              </span>
+              <Sparkles className="w-3.5 h-3.5" />
               <span>Vereinfacht</span>
             </button>
           </div>
@@ -407,41 +431,39 @@ export default function TranslatorView({ onOpenDialogue, isForcedOffline = false
           {/* Voice Input (Microphone) */}
           <div className="relative flex items-center justify-center">
             {isRecording && (
-              <span className="absolute w-14 h-14 rounded-full bg-school-orange/30 animate-ping pointer-events-none"></span>
+              <span className="absolute w-12 h-12 rounded-xl bg-red-500/30 animate-ping pointer-events-none"></span>
             )}
             <button
               onClick={toggleSpeechRecognition}
               aria-label="Sprachaufnahme"
-              className={`w-12 h-12 rounded-full flex items-center justify-center text-white shadow-md transition-all z-10 active:scale-90 ${
+              className={`w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-sm transition-all z-10 active:scale-[0.92] ${
                 isRecording
-                  ? 'bg-red-600 ring-4 ring-red-200 animate-pulse'
-                  : 'bg-gradient-to-br from-school-orange via-amber-500 to-school-orange hover:shadow-school-orange/30'
+                  ? 'bg-red-600 ring-2 ring-red-300 animate-pulse'
+                  : 'bg-school-orange hover:bg-school-orangeDark shadow-xs'
               }`}
               title={isRecording ? 'Aufnahme stoppen' : 'Aufnahme starten'}
             >
-              <span className="material-symbols-outlined text-[24px]">
-                {isRecording ? 'stop' : 'mic'}
-              </span>
+              {isRecording ? <Square className="w-4 h-4 fill-white" /> : <Mic className="w-5 h-5" />}
             </button>
           </div>
         </div>
       </div>
 
-      {/* 4. Live Translation Output Card */}
-      <div className="bg-gradient-to-b from-teal-50/80 via-white to-teal-50/40 rounded-2xl p-4 shadow-sm flex flex-col gap-3 border border-teal-200/90 relative">
+      {/* 4. Live Translation Output Card (Apple macOS / Linear Clean Finish) */}
+      <div className="bg-gradient-to-b from-teal-50/30 via-white to-white rounded-2xl p-4.5 shadow-[0_1px_3px_rgba(0,0,0,0.03),0_8px_20px_-8px_rgba(0,168,150,0.05)] flex flex-col gap-3 border border-teal-200/60 relative">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-extrabold text-school-blue">
+            <span className="text-sm font-bold text-slate-900">
               {currentTargetObj.flag} {currentTargetObj.name}
             </span>
-            <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-school-orange/15 text-school-orangeDark border border-school-orange/30 text-[11px] font-bold">
-              <span className="material-symbols-outlined text-[13px] material-symbols-fill">verified</span>
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 border border-emerald-500/20 text-[11px] font-semibold">
+              <CheckCircle2 className="w-3 h-3 text-emerald-600" />
               <span>Schulzertifiziert</span>
             </span>
           </div>
 
           <div className="flex items-center gap-1">
-            <span className="text-[11px] font-bold text-slate-400">
+            <span className="text-[11px] font-mono tabular-nums font-semibold text-slate-400">
               {isTranslating ? 'Übersetze...' : `${metaInfo.engine} (${metaInfo.duration})`}
             </span>
           </div>
@@ -451,24 +473,24 @@ export default function TranslatorView({ onOpenDialogue, isForcedOffline = false
         <div className="text-slate-900 text-lg sm:text-xl font-semibold leading-relaxed select-text min-h-[50px] flex items-center">
           {isTranslating ? (
             <div className="flex items-center gap-2 text-school-teal text-sm">
-              <span className="w-2 h-2 rounded-full bg-school-teal animate-bounce"></span>
-              <span className="w-2 h-2 rounded-full bg-school-teal animate-bounce [animation-delay:0.2s]"></span>
-              <span className="w-2 h-2 rounded-full bg-school-teal animate-bounce [animation-delay:0.4s]"></span>
-              <span>Pädagogische Übersetzung wird geladen...</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-school-teal animate-bounce"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-school-teal animate-bounce [animation-delay:0.2s]"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-school-teal animate-bounce [animation-delay:0.4s]"></span>
+              <span className="font-medium text-slate-600">Pädagogische Übersetzung wird geladen...</span>
             </div>
           ) : translatedText ? (
             translatedText
           ) : (
-            <span className="text-slate-400 italic text-base">Übersetzung erscheint hier...</span>
+            <span className="text-slate-400 italic text-base font-normal">Übersetzung erscheint hier...</span>
           )}
         </div>
 
         {/* Phonetic Pronunciation Guide */}
         {phoneticText && (
-          <div className="bg-white/95 border border-school-blue/15 rounded-xl p-2.5 flex items-center justify-between text-slate-700 text-xs shadow-xs">
-            <div className="flex items-center gap-2 overflow-hidden">
-              <div className="w-6 h-6 rounded-full bg-school-orange/15 flex items-center justify-center shrink-0 border border-school-orange/30 text-school-orangeDark">
-                <span className="material-symbols-outlined text-[14px]">record_voice_over</span>
+          <div className="bg-white border border-slate-200/80 rounded-xl p-2.5 flex items-center justify-between text-slate-700 text-xs shadow-2xs">
+            <div className="flex items-center gap-2.5 overflow-hidden">
+              <div className="w-7 h-7 rounded-lg bg-school-orange/10 flex items-center justify-center shrink-0 border border-school-orange/20 text-school-orange">
+                <Volume2 className="w-3.5 h-3.5" />
               </div>
               <div className="flex flex-col min-w-0">
                 <span className="text-[10px] font-bold text-school-orange uppercase tracking-wider">
@@ -481,7 +503,7 @@ export default function TranslatorView({ onOpenDialogue, isForcedOffline = false
             </div>
             <button
               onClick={() => handleSpeak(phoneticText, 'de')}
-              className="text-school-tealDark bg-school-teal/15 hover:bg-school-teal/25 px-2 py-1 rounded-full text-[11px] font-bold shrink-0 border border-school-teal/30 transition-colors ml-2"
+              className="text-school-tealDark bg-school-teal/10 hover:bg-school-teal/20 px-2.5 py-1 rounded-lg text-[11px] font-bold shrink-0 border border-school-teal/20 transition-all active:scale-[0.96] ml-2"
             >
               Langsam anhören
             </button>
@@ -490,10 +512,8 @@ export default function TranslatorView({ onOpenDialogue, isForcedOffline = false
 
         {/* Pedagogical Tip from AI */}
         {pedagogicalTip && (
-          <div className="bg-blue-50/70 border border-blue-200/70 rounded-xl p-2.5 flex items-center gap-2 text-xs text-blue-900 shadow-2xs">
-            <span className="material-symbols-outlined text-[18px] text-school-blue shrink-0">
-              tips_and_updates
-            </span>
+          <div className="bg-blue-50/60 border border-blue-200/60 rounded-xl p-2.5 flex items-center gap-2.5 text-xs text-blue-900 shadow-2xs">
+            <Lightbulb className="w-4 h-4 text-school-blue shrink-0" />
             <div className="flex flex-col min-w-0">
               <span className="text-[10px] font-bold uppercase text-school-blue tracking-wider">
                 Pädagogischer Praxistipp
@@ -506,14 +526,14 @@ export default function TranslatorView({ onOpenDialogue, isForcedOffline = false
         )}
 
         {/* Output Action Bar */}
-        <div className="flex items-center justify-between pt-1 border-t border-teal-100/60">
+        <div className="flex items-center justify-between pt-1 border-t border-slate-100">
           <div className="flex items-center gap-2">
             <button
               onClick={() => handleSpeak(translatedText, targetLang)}
               disabled={!translatedText}
-              className="h-10 px-4 rounded-full bg-gradient-to-r from-school-blue to-school-teal hover:from-school-blueDark hover:to-school-tealDark text-white flex items-center gap-1.5 shadow-sm active:scale-95 transition-all text-xs font-bold disabled:opacity-40"
+              className="h-9 px-3.5 rounded-xl bg-school-blue hover:bg-school-blueDark text-white flex items-center gap-1.5 shadow-xs active:scale-[0.96] transition-all text-xs font-bold disabled:opacity-30"
             >
-              <span className="material-symbols-outlined text-[18px]">volume_up</span>
+              <Volume2 className="w-4 h-4" />
               <span>Anhören</span>
             </button>
 
@@ -523,7 +543,7 @@ export default function TranslatorView({ onOpenDialogue, isForcedOffline = false
                 const nextSpeed = speechSpeed === 1.0 ? 0.75 : speechSpeed === 0.75 ? 1.25 : 1.0;
                 setSpeechSpeed(nextSpeed);
               }}
-              className="h-10 px-2.5 rounded-full bg-white text-school-blue text-xs font-bold border border-school-blue/25 hover:bg-school-blue/10 transition-colors"
+              className="h-9 px-2.5 rounded-xl bg-white text-school-blue font-mono tabular-nums text-xs font-bold border border-slate-200/80 hover:border-slate-300 shadow-2xs active:scale-[0.96] transition-all"
               title="Sprechgeschwindigkeit (Klicken zum Ändern)"
             >
               {speechSpeed}x
@@ -535,71 +555,66 @@ export default function TranslatorView({ onOpenDialogue, isForcedOffline = false
             <button
               onClick={toggleBookmark}
               disabled={!translatedText}
-              className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors active:scale-90 border ${
+              className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all active:scale-[0.94] border shadow-2xs ${
                 isBookmarked
-                  ? 'bg-amber-100 text-amber-600 border-amber-300'
-                  : 'bg-white text-slate-500 hover:text-school-orange border-school-blue/20'
+                  ? 'bg-amber-500/15 text-amber-700 border-amber-400/40'
+                  : 'bg-white text-slate-500 hover:text-slate-800 border-slate-200/80 hover:border-slate-300'
               }`}
               title="Zur Lernkartei / Gemerkt"
             >
-              <span className={`material-symbols-outlined text-[18px] ${isBookmarked ? 'material-symbols-fill' : ''}`}>
-                {isBookmarked ? 'bookmark_added' : 'bookmark_add'}
-              </span>
+              <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-amber-600' : ''}`} />
             </button>
 
             {/* Copy button */}
             <button
               onClick={handleCopy}
               disabled={!translatedText}
-              className="w-9 h-9 rounded-full bg-white text-slate-500 hover:text-school-teal flex items-center justify-center transition-colors active:scale-90 border border-school-blue/20"
+              className="w-9 h-9 rounded-xl bg-white text-slate-500 hover:text-slate-800 flex items-center justify-center transition-all active:scale-[0.94] border border-slate-200/80 hover:border-slate-300 shadow-2xs"
               title="Kopieren"
             >
-              <span className="material-symbols-outlined text-[18px]">
-                {copied ? 'check' : 'content_copy'}
-              </span>
+              {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
             </button>
 
             {/* Fullscreen presentation button */}
             <button
               onClick={() => setFullscreen(true)}
               disabled={!translatedText}
-              className="w-9 h-9 rounded-full bg-white text-slate-500 hover:text-school-blue flex items-center justify-center transition-colors active:scale-90 border border-school-blue/20"
+              className="w-9 h-9 rounded-xl bg-white text-slate-500 hover:text-slate-800 flex items-center justify-center transition-all active:scale-[0.94] border border-slate-200/80 hover:border-slate-300 shadow-2xs"
               title="Präsentationsmodus für iPad"
             >
-              <span className="material-symbols-outlined text-[18px]">fullscreen</span>
+              <Maximize2 className="w-4 h-4" />
             </button>
           </div>
         </div>
       </div>
 
       {/* 5. Classroom 2-Way Dialog Banner */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-school-blue via-school-blue to-school-teal text-white rounded-2xl p-4 shadow-md border border-school-blue/30">
-        <div className="absolute -right-6 -bottom-6 w-28 h-28 rounded-full bg-school-orange/20 blur-xl pointer-events-none"></div>
+      <div className="relative overflow-hidden bg-gradient-to-r from-school-blue to-school-teal text-white rounded-2xl p-4 shadow-sm border border-school-blue/20">
         <div className="flex items-center justify-between gap-3 relative z-10">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-full bg-white/20 border border-white/30 flex items-center justify-center shrink-0 shadow-inner">
-              <span className="material-symbols-outlined text-white text-[24px]">forum</span>
+            <div className="w-10 h-10 rounded-xl bg-white/15 border border-white/25 flex items-center justify-center shrink-0">
+              <MessageSquare className="w-5 h-5 text-white" />
             </div>
             <div className="flex flex-col min-w-0">
               <div className="flex items-center gap-1.5">
-                <span className="text-base text-white font-extrabold leading-tight">
+                <span className="text-sm font-bold text-white leading-tight">
                   2-Wege-Gespräch
                 </span>
-                <span className="px-1.5 py-0.2 rounded bg-school-orange text-white text-[9px] font-extrabold uppercase">
+                <span className="px-1.5 py-0.2 rounded-full bg-school-orange text-white text-[9px] font-black uppercase shadow-xs">
                   Live
                 </span>
               </div>
-              <span className="text-xs text-white/90 truncate">
+              <span className="text-xs text-white/80 truncate">
                 Geteilter Bildschirm für Elterngespräche auf dem Tisch
               </span>
             </div>
           </div>
           <button
             onClick={onOpenDialogue}
-            className="h-9 px-3.5 rounded-full bg-school-orange hover:bg-school-orangeDark text-white text-xs font-extrabold flex items-center gap-1 shadow-sm active:scale-95 transition-all shrink-0"
+            className="h-8.5 px-3.5 rounded-xl bg-white text-school-blue hover:bg-slate-50 text-xs font-bold flex items-center gap-1 shadow-xs active:scale-[0.96] transition-all shrink-0"
           >
             <span>Starten</span>
-            <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+            <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
@@ -614,9 +629,9 @@ export default function TranslatorView({ onOpenDialogue, isForcedOffline = false
             </div>
             <button
               onClick={() => setFullscreen(false)}
-              className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-700 active:scale-90 transition-transform"
+              className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-700 active:scale-[0.92] transition-all"
             >
-              <span className="material-symbols-outlined text-[28px]">close</span>
+              <X className="w-5 h-5" />
             </button>
           </div>
 
@@ -639,9 +654,9 @@ export default function TranslatorView({ onOpenDialogue, isForcedOffline = false
           <div className="flex items-center justify-center gap-4 pt-4">
             <button
               onClick={() => handleSpeak(translatedText, targetLang)}
-              className="h-14 px-8 rounded-full bg-gradient-to-r from-school-blue to-school-teal text-white text-lg font-bold flex items-center gap-2 shadow-lg"
+              className="h-12 px-6 rounded-xl bg-school-blue hover:bg-school-blueDark text-white text-base font-bold flex items-center gap-2 shadow-sm active:scale-[0.96] transition-all"
             >
-              <span className="material-symbols-outlined text-[26px]">volume_up</span>
+              <Volume2 className="w-5 h-5" />
               <span>Laut Vorlesen</span>
             </button>
           </div>

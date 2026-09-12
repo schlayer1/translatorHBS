@@ -1,9 +1,36 @@
 import React, { useState, useRef } from 'react';
+import { 
+  Mail, 
+  FileText, 
+  Sparkles, 
+  Mic, 
+  Square, 
+  Copy, 
+  Check, 
+  Share2, 
+  Calendar, 
+  AlertCircle, 
+  Compass, 
+  PenTool, 
+  Award, 
+  ChevronDown, 
+  Lightbulb, 
+  Volume2,
+  BookOpen
+} from 'lucide-react';
 import { PARENT_LETTER_TEMPLATES } from '../data/parentLetterTemplates';
 import { SUPPORTED_LANGUAGES, getLanguage } from '../data/languages';
 import { geminiService } from '../services/geminiService';
 import { storageService } from '../services/storageService';
 import { speechService } from '../services/speechService';
+
+const TEMPLATE_ICONS = {
+  calendar_month: Calendar,
+  assignment_late: AlertCircle,
+  hiking: Compass,
+  draw: PenTool,
+  hotel_class: Award,
+};
 
 export default function ParentLetterView({ isForcedOffline = false }) {
   const [targetLang, setTargetLang] = useState('uk');
@@ -135,27 +162,26 @@ export default function ParentLetterView({ isForcedOffline = false }) {
   };
 
   return (
-    <div className="flex flex-col w-full max-w-4xl mx-auto px-4 pt-20 pb-28 gap-5">
+    <div className="flex flex-col w-full max-w-4xl mx-auto px-4 pt-20 pb-28 gap-4">
       {/* Header with EduPage Badge */}
-      <div className="flex items-start justify-between gap-2">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-extrabold text-school-blue flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-[24px]">mark_email_read</span>
-              Elternbriefe & EduPage
+            <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <Mail className="w-5 h-5 text-school-blue" />
+              <span>Elternbriefe & EduPage</span>
             </h1>
-            <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold uppercase tracking-wider border border-emerald-300 shadow-2xs">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 text-[10px] font-bold uppercase tracking-wider border border-emerald-500/20">
               EduPage Ready
             </span>
           </div>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-400 mt-0.5">
             Schultexte auf DeepL-Write-Niveau veredeln & zweisprachig in EduPage einfügen
           </p>
         </div>
 
         {/* Target Language Dropdown */}
-        <div className="flex items-center gap-1.5">
-          <span className="text-xs font-bold text-slate-500 hidden sm:inline">An Eltern:</span>
+        <div className="relative shrink-0 sm:w-48">
           <select
             value={targetLang}
             onChange={(e) => {
@@ -163,44 +189,44 @@ export default function ParentLetterView({ isForcedOffline = false }) {
               setBilingualText('');
               setTranslatedLetter('');
             }}
-            className="px-3 py-1.5 bg-white border border-school-teal/30 rounded-xl text-school-tealDark font-bold text-xs shadow-xs focus:outline-none"
+            className="w-full h-10 pl-3 pr-8 rounded-xl bg-white border border-slate-200/80 text-slate-800 text-xs font-bold shadow-2xs appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-school-blue/20"
           >
             {SUPPORTED_LANGUAGES.filter(l => l.code !== 'de').map(l => (
               <option key={l.code} value={l.code}>
-                {l.flag} {l.name}
+                {l.flag} An Eltern: {l.name}
               </option>
             ))}
           </select>
+          <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-3.5 pointer-events-none" />
         </div>
       </div>
 
       {/* 1. Quick Template Chips */}
       <div className="flex flex-col gap-1.5">
-        <span className="text-xs font-bold text-slate-600 flex items-center gap-1">
-          <span className="material-symbols-outlined text-[16px] text-school-orange material-symbols-fill">
-            auto_stories
-          </span>
+        <span className="text-xs font-semibold text-slate-500 flex items-center gap-1">
+          <BookOpen className="w-3.5 h-3.5 text-school-orange" />
           Fertige EduPage-Vorlagen (Sofort einfügen):
         </span>
         <div className="flex flex-wrap gap-1.5 py-0.5">
-          {PARENT_LETTER_TEMPLATES.map((tmpl) => (
-            <button
-              key={tmpl.id}
-              onClick={() => handleSelectTemplate(tmpl)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-school-blue/25 hover:border-school-blue text-slate-700 hover:text-school-blue text-xs font-bold shadow-xs hover:bg-school-blue/5 active:scale-95 transition-all"
-            >
-              <span className="material-symbols-outlined text-[16px] text-school-blue">
-                {tmpl.icon}
-              </span>
-              <span className="sm:hidden">{tmpl.shortTitle || tmpl.title}</span>
-              <span className="hidden sm:inline">{tmpl.title}</span>
-            </button>
-          ))}
+          {PARENT_LETTER_TEMPLATES.map((tmpl) => {
+            const Icon = TEMPLATE_ICONS[tmpl.icon] || FileText;
+            return (
+              <button
+                key={tmpl.id}
+                onClick={() => handleSelectTemplate(tmpl)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200/80 hover:border-slate-300 text-slate-700 hover:text-slate-900 text-xs font-semibold shadow-2xs hover:bg-slate-50 active:scale-[0.98] transition-all"
+              >
+                <Icon className="w-3.5 h-3.5 text-school-blue" />
+                <span className="sm:hidden">{tmpl.shortTitle || tmpl.title}</span>
+                <span className="hidden sm:inline">{tmpl.title}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* 2. Draft Input Card */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-school-border flex flex-col gap-3">
+      <div className="bg-white rounded-2xl p-4.5 shadow-[0_1px_3px_rgba(0,0,0,0.03),0_8px_20px_-8px_rgba(11,123,167,0.04)] border border-slate-200/80 flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
             <span>🇩🇪</span>
@@ -210,16 +236,14 @@ export default function ParentLetterView({ isForcedOffline = false }) {
             <button
               type="button"
               onClick={toggleSpeechRecognition}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold transition-all ${
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold transition-all active:scale-[0.96] ${
                 isRecording
                   ? 'bg-red-600 text-white animate-pulse shadow-sm'
-                  : 'bg-school-blue/10 text-school-blue hover:bg-school-blue/20 border border-school-blue/20'
+                  : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200/60'
               }`}
               title={isRecording ? 'Aufnahme stoppen' : 'Entwurf per Mikrofon einsprechen'}
             >
-              <span className="material-symbols-outlined text-[15px]">
-                {isRecording ? 'stop' : 'mic'}
-              </span>
+              {isRecording ? <Square className="w-3 h-3 fill-white" /> : <Mic className="w-3.5 h-3.5 text-slate-600" />}
               <span>{isRecording ? 'Hört zu...' : 'Einsprechen'}</span>
             </button>
             {draftText && (
@@ -231,7 +255,7 @@ export default function ParentLetterView({ isForcedOffline = false }) {
                   setTranslatedLetter('');
                   setBilingualText('');
                 }}
-                className="text-xs text-slate-400 hover:text-red-600 font-semibold"
+                className="text-xs text-slate-400 hover:text-red-600 font-semibold active:scale-[0.94] transition-colors"
               >
                 Löschen
               </button>
@@ -243,18 +267,18 @@ export default function ParentLetterView({ isForcedOffline = false }) {
           rows={4}
           value={draftText}
           onChange={(e) => setDraftText(e.target.value)}
-          placeholder="Tippe deinen Entwurf oder Notizen ein (z. B. 'Kind hat Hausaufgabe vergessen, bitte bis morgen nachholen' oder 'Wandertag nächste Woche Donnerstag Treffpunkt Schulhof')..."
-          className="w-full bg-slate-50/60 p-3 rounded-xl border border-slate-200 text-sm font-medium focus:outline-none focus:border-school-blue placeholder:text-slate-400 leading-relaxed resize-none"
+          placeholder="Tippe deinen Entwurf oder Notizen ein..."
+          className="w-full bg-slate-50/60 p-3 rounded-xl border border-slate-200/70 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-school-blue/20 placeholder:text-slate-400 leading-relaxed resize-none"
         />
 
         {errorMessage && (
-          <p className="text-xs text-amber-700 bg-amber-50 p-2 rounded-lg border border-amber-200">
+          <p className="text-xs text-amber-800 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20">
             {errorMessage}
           </p>
         )}
 
         {/* Generate / Polish Button */}
-        <div className="flex items-center justify-between pt-1">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1">
           <span className="text-[11px] text-slate-400 font-medium">
             KI formuliert den Text professionell & kind-/elternfreundlich um
           </span>
@@ -262,7 +286,7 @@ export default function ParentLetterView({ isForcedOffline = false }) {
           <button
             onClick={handlePolishAndTranslate}
             disabled={isLoading || !draftText.trim()}
-            className="px-5 py-2.5 rounded-full bg-gradient-to-r from-school-blue via-school-teal to-school-tealDark hover:from-school-blueDark hover:to-school-tealDark text-white font-extrabold text-xs shadow-md active:scale-95 transition-all flex items-center gap-2 disabled:opacity-50"
+            className="h-10 px-5 rounded-xl bg-school-blue hover:bg-school-blueDark text-white font-bold text-xs shadow-xs active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-40"
           >
             {isLoading ? (
               <>
@@ -271,8 +295,8 @@ export default function ParentLetterView({ isForcedOffline = false }) {
               </>
             ) : (
               <>
-                <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
-                <span>KI-Schliff & Übersetzung (DeepL-Write-Stil)</span>
+                <Sparkles className="w-4 h-4" />
+                <span>KI-Schliff & Übersetzung</span>
               </>
             )}
           </button>
@@ -281,35 +305,36 @@ export default function ParentLetterView({ isForcedOffline = false }) {
 
       {/* 3. Result Section with EduPage Copy */}
       {(bilingualText || polishedGerman || translatedLetter) && (
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-teal-200/90 flex flex-col gap-3">
+        <div className="bg-white rounded-2xl p-4.5 shadow-[0_1px_3px_rgba(0,0,0,0.03),0_8px_20px_-8px_rgba(0,168,150,0.05)] border border-teal-200/60 flex flex-col gap-3">
           {/* Result Segmented Tabs */}
-          <div className="flex items-center justify-between flex-wrap gap-2 border-b border-slate-100 pb-2">
-            <div className="flex bg-slate-100 p-1 rounded-xl">
+          <div className="flex items-center justify-between flex-wrap gap-2 border-b border-slate-100 pb-2.5">
+            <div className="flex bg-slate-100/80 p-1 rounded-xl gap-1">
               <button
                 onClick={() => setActiveResultTab('bilingual')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all flex items-center gap-1 ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all active:scale-[0.98] flex items-center gap-1.5 ${
                   activeResultTab === 'bilingual'
-                    ? 'bg-white text-school-blue shadow-xs'
+                    ? 'bg-white text-school-blue shadow-2xs'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                <span>📋 Zweisprachig (Für EduPage)</span>
+                <Copy className="w-3.5 h-3.5" />
+                <span>Zweisprachig (EduPage)</span>
               </button>
               <button
                 onClick={() => setActiveResultTab('german')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all active:scale-[0.98] ${
                   activeResultTab === 'german'
-                    ? 'bg-white text-school-blue shadow-xs'
+                    ? 'bg-white text-school-blue shadow-2xs'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                🇩🇪 Geschliffenes Deutsch
+                🇩🇪 Deutsch
               </button>
               <button
                 onClick={() => setActiveResultTab('target')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all active:scale-[0.98] ${
                   activeResultTab === 'target'
-                    ? 'bg-white text-school-tealDark shadow-xs'
+                    ? 'bg-white text-school-tealDark shadow-2xs'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -320,11 +345,9 @@ export default function ParentLetterView({ isForcedOffline = false }) {
             {/* Main Primary EduPage Copy Button */}
             <button
               onClick={() => handleCopy(bilingualText, 'bilingual')}
-              className="h-9 px-4 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
+              className="h-9 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-xs active:scale-[0.96] transition-all"
             >
-              <span className="material-symbols-outlined text-[16px]">
-                {copiedType === 'bilingual' ? 'check' : 'content_copy'}
-              </span>
+              {copiedType === 'bilingual' ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
               <span>{copiedType === 'bilingual' ? 'Für EduPage kopiert!' : 'In EduPage einfügen (Kopieren)'}</span>
             </button>
           </div>
@@ -338,10 +361,8 @@ export default function ParentLetterView({ isForcedOffline = false }) {
 
           {/* Writing Tips from AI */}
           {writingTip && (
-            <div className="bg-amber-50/80 border border-amber-200 rounded-xl p-2.5 flex items-center gap-2 text-xs text-amber-900">
-              <span className="material-symbols-outlined text-[18px] text-amber-600 shrink-0">
-                lightbulb
-              </span>
+            <div className="bg-amber-50/70 border border-amber-200/70 rounded-xl p-2.5 flex items-center gap-2.5 text-xs text-amber-900 shadow-2xs">
+              <Lightbulb className="w-4 h-4 text-amber-600 shrink-0" />
               <span>{writingTip}</span>
             </div>
           )}
@@ -352,32 +373,32 @@ export default function ParentLetterView({ isForcedOffline = false }) {
               <button
                 onClick={() => handleSpeak(translatedLetter, targetLang)}
                 disabled={!translatedLetter}
-                className="h-8 px-3 rounded-full bg-school-teal/10 hover:bg-school-teal/20 text-school-tealDark font-bold flex items-center gap-1 transition-colors disabled:opacity-40"
+                className="h-8 px-3 rounded-lg bg-school-teal/10 hover:bg-school-teal/20 text-school-tealDark font-bold flex items-center gap-1.5 transition-all active:scale-[0.96] disabled:opacity-40"
               >
-                <span className="material-symbols-outlined text-[16px]">volume_up</span>
-                <span>{targetLangObj.name} vorlesen</span>
+                <Volume2 className="w-3.5 h-3.5" />
+                <span>{targetLangObj.name}</span>
               </button>
               <button
                 onClick={() => handleSpeak(polishedGerman, 'de')}
                 disabled={!polishedGerman}
-                className="h-8 px-3 rounded-full bg-school-blue/10 hover:bg-school-blue/20 text-school-blue font-bold flex items-center gap-1 transition-colors disabled:opacity-40"
+                className="h-8 px-3 rounded-lg bg-school-blue/10 hover:bg-school-blue/20 text-school-blue font-bold flex items-center gap-1.5 transition-all active:scale-[0.96] disabled:opacity-40"
               >
-                <span className="material-symbols-outlined text-[16px]">volume_up</span>
-                <span>Deutsch vorlesen</span>
+                <Volume2 className="w-3.5 h-3.5" />
+                <span>Deutsch</span>
               </button>
             </div>
 
             <div className="flex items-center gap-1.5">
               <button
                 onClick={() => handleCopy(polishedGerman, 'german')}
-                className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold transition-colors"
+                className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-all active:scale-[0.96] border border-slate-200/60"
                 title="Nur die deutsche Fassung kopieren"
               >
                 {copiedType === 'german' ? 'Kopiert!' : 'Nur DE'}
               </button>
               <button
                 onClick={() => handleCopy(translatedLetter, 'target')}
-                className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold transition-colors"
+                className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-all active:scale-[0.96] border border-slate-200/60"
                 title="Nur die Übersetzung kopieren"
               >
                 {copiedType === 'target' ? 'Kopiert!' : `Nur ${targetLangObj.code.toUpperCase()}`}

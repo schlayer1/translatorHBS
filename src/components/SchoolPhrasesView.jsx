@@ -1,8 +1,38 @@
 import React, { useState, useRef } from 'react';
+import { 
+  Search, 
+  Mic, 
+  Square, 
+  Volume2, 
+  Play, 
+  Copy, 
+  Check, 
+  Bookmark, 
+  X, 
+  FileSearch,
+  BookOpen,
+  GraduationCap,
+  Backpack,
+  Clock,
+  UtensilsCrossed,
+  HeartPulse,
+  Mail,
+  ChevronDown
+} from 'lucide-react';
 import { SCHOOL_CATEGORIES, SCHOOL_PHRASES } from '../data/schoolPhrases';
 import { SUPPORTED_LANGUAGES, getLanguage } from '../data/languages';
 import { speechService } from '../services/speechService';
 import { storageService } from '../services/storageService';
+
+const CATEGORY_ICONS = {
+  all: BookOpen,
+  unterricht: GraduationCap,
+  hausaufgaben: Backpack,
+  orga: Clock,
+  mensa: UtensilsCrossed,
+  gesundheit: HeartPulse,
+  eltern: Mail,
+};
 
 export default function SchoolPhrasesView() {
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -60,7 +90,7 @@ export default function SchoolPhrasesView() {
     setPlayingId(phrase.id);
     speechService.speak({
       text,
-      lang: targetLangObj.speechCode,
+      lang: targetLang,
       onEnd: () => setPlayingId(null),
       onError: () => setPlayingId(null),
     });
@@ -68,85 +98,72 @@ export default function SchoolPhrasesView() {
 
   const handleCopy = (phrase) => {
     const text = phrase[targetLang];
-    navigator.clipboard?.writeText(text);
-    setCopiedId(phrase.id);
-    setTimeout(() => setCopiedId(null), 1500);
+    if (!text) return;
+    navigator.clipboard?.writeText(text).then(() => {
+      setCopiedId(phrase.id);
+      setTimeout(() => setCopiedId(null), 1500);
+    });
   };
 
   const handleBookmark = (phrase) => {
-    storageService.addBookmark({
-      id: phrase.id,
+    storageService.savePhrase({
       sourceText: phrase.de,
-      targetText: phrase[targetLang],
+      translatedText: phrase[targetLang],
       sourceLang: 'de',
       targetLang,
-      phonetic: phrase.uk_phonetic || '',
       category: phrase.category,
     });
   };
 
   return (
     <div className="flex flex-col w-full max-w-4xl mx-auto px-4 pt-20 pb-28 gap-4">
-      {/* Header Info */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-extrabold text-school-blue flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-[24px]">auto_stories</span>
-            Schul-Redemittel
-          </h1>
-          <p className="text-xs text-slate-500">
-            Kuratierte Mustersätze für den Unterricht (100% offline & verifiziert)
-          </p>
+      {/* Search & Language Bar */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+        {/* Language Target Pill Selector */}
+        <div className="relative shrink-0 sm:w-48">
+          <select
+            value={targetLang}
+            onChange={(e) => setTargetLang(e.target.value)}
+            className="w-full h-10 pl-3 pr-8 rounded-xl bg-white border border-slate-200/80 text-slate-800 text-xs font-bold shadow-2xs appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-school-blue/20"
+          >
+            {SUPPORTED_LANGUAGES.filter(l => l.code !== 'de').map((l) => (
+              <option key={l.code} value={l.code}>
+                {l.flag} Zielsprache: {l.name}
+              </option>
+            ))}
+          </select>
+          <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-3.5 pointer-events-none" />
         </div>
 
-        {/* Target Lang Switcher */}
-        <select
-          value={targetLang}
-          onChange={(e) => setTargetLang(e.target.value)}
-          className="px-3 py-1.5 bg-white border border-school-teal/30 rounded-xl text-school-tealDark font-bold text-xs shadow-xs focus:outline-none"
-        >
-          {SUPPORTED_LANGUAGES.filter(l => l.code !== 'de').map(l => (
-            <option key={l.code} value={l.code}>
-              {l.flag} {l.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Search Input */}
-      <div className="relative flex items-center">
-        <span className="material-symbols-outlined absolute left-3.5 text-slate-400 text-[20px]">
-          search
-        </span>
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder={isSearchingVoice ? '🔴 Hört zu... Begriff sprechen...' : "Redemittel durchsuchen (z. B. 'Buch', 'Pause', 'Hausaufgabe')..."}
-          className="w-full pl-11 pr-20 py-2.5 rounded-2xl bg-white border border-school-border text-sm font-medium focus:outline-none shadow-xs placeholder:text-slate-400"
-        />
-        <div className="absolute right-2.5 flex items-center gap-1">
+        {/* Live Filter / Search Input */}
+        <div className="relative flex-1 flex items-center bg-white rounded-xl border border-slate-200/80 shadow-2xs px-3 h-10 gap-2">
+          <Search className="w-4 h-4 text-slate-400 shrink-0" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Redemittel durchsuchen..."
+            className="w-full bg-transparent text-xs font-medium text-slate-800 placeholder:text-slate-400 focus:outline-none"
+          />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="p-1 text-slate-400 hover:text-slate-600 rounded-full"
+              className="p-1 text-slate-400 hover:text-slate-600 rounded-lg active:scale-[0.94]"
               title="Suche leeren"
             >
-              <span className="material-symbols-outlined text-[18px]">close</span>
+              <X className="w-3.5 h-3.5" />
             </button>
           )}
           <button
             onClick={toggleSearchSpeech}
-            className={`p-1.5 rounded-full flex items-center justify-center transition-all ${
+            className={`p-1.5 rounded-lg flex items-center justify-center transition-all active:scale-[0.94] ${
               isSearchingVoice
                 ? 'bg-red-600 text-white animate-pulse'
                 : 'text-slate-400 hover:text-school-blue hover:bg-slate-100'
             }`}
             title={isSearchingVoice ? 'Aufnahme stoppen' : 'Suchbegriff per Stimme einsprechen'}
           >
-            <span className="material-symbols-outlined text-[20px]">
-              {isSearchingVoice ? 'stop' : 'mic'}
-            </span>
+            {isSearchingVoice ? <Square className="w-3.5 h-3.5 fill-white" /> : <Mic className="w-3.5 h-3.5" />}
           </button>
         </div>
       </div>
@@ -155,19 +172,18 @@ export default function SchoolPhrasesView() {
       <div className="flex flex-wrap gap-1.5 py-0.5">
         {SCHOOL_CATEGORIES.map((cat) => {
           const isSelected = selectedCategory === cat.id;
+          const Icon = CATEGORY_ICONS[cat.id] || BookOpen;
           return (
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all active:scale-[0.98] ${
                 isSelected
-                  ? 'bg-school-blue text-white shadow-xs'
-                  : 'bg-white text-slate-600 border border-school-blue/20 hover:bg-school-blue/5 hover:border-school-blue/40'
+                  ? 'bg-school-blue text-white shadow-xs font-bold'
+                  : 'bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50 hover:border-slate-300'
               }`}
             >
-              <span className={`material-symbols-outlined text-[16px] ${isSelected ? 'text-white' : 'text-school-blue'}`}>
-                {cat.icon}
-              </span>
+              <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-white' : 'text-school-blue'}`} />
               <span className="sm:hidden">{cat.shortLabel || cat.label}</span>
               <span className="hidden sm:inline">{cat.label}</span>
             </button>
@@ -186,7 +202,7 @@ export default function SchoolPhrasesView() {
             return (
               <div
                 key={phrase.id}
-                className="bg-white rounded-2xl p-4 shadow-xs border border-school-border hover:border-school-blue/30 transition-all flex flex-col gap-2"
+                className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.03),0_6px_16px_-6px_rgba(11,123,167,0.03)] border border-slate-200/80 hover:border-slate-300 transition-all flex flex-col gap-2.5"
               >
                 {/* German Source */}
                 <div className="flex items-start justify-between gap-2">
@@ -196,7 +212,7 @@ export default function SchoolPhrasesView() {
                 </div>
 
                 {/* Target Translation */}
-                <div className="p-2.5 rounded-xl bg-teal-50/60 border border-teal-100 flex flex-col gap-1">
+                <div className="p-3 rounded-xl bg-teal-50/40 border border-teal-200/50 flex flex-col gap-1">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-school-tealDark flex items-center gap-1">
                       <span>{targetLangObj.flag}</span>
@@ -219,36 +235,30 @@ export default function SchoolPhrasesView() {
                 <div className="flex items-center justify-between pt-1 border-t border-slate-100">
                   <button
                     onClick={() => handleSpeak(phrase)}
-                    className={`h-8 px-3 rounded-full text-xs font-bold flex items-center gap-1.5 transition-colors ${
+                    className={`h-8 px-3 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all active:scale-[0.96] ${
                       isPlaying
-                        ? 'bg-school-teal text-white'
+                        ? 'bg-school-teal text-white shadow-xs'
                         : 'bg-school-blue/10 text-school-blue hover:bg-school-blue/20'
                     }`}
                   >
-                    <span className="material-symbols-outlined text-[16px]">
-                      {isPlaying ? 'volume_up' : 'play_arrow'}
-                    </span>
+                    {isPlaying ? <Volume2 className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
                     <span>Anhören</span>
                   </button>
 
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => handleCopy(phrase)}
-                      className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors"
+                      className="w-8 h-8 rounded-lg bg-slate-100/80 hover:bg-slate-200/80 text-slate-600 flex items-center justify-center transition-all active:scale-[0.94] border border-slate-200/60"
                       title="Kopieren"
                     >
-                      <span className="material-symbols-outlined text-[16px]">
-                        {isCopied ? 'check' : 'content_copy'}
-                      </span>
+                      {isCopied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                     </button>
                     <button
                       onClick={() => handleBookmark(phrase)}
-                      className="w-8 h-8 rounded-full bg-slate-100 hover:bg-amber-100 text-slate-600 hover:text-amber-600 flex items-center justify-center transition-colors"
+                      className="w-8 h-8 rounded-lg bg-slate-100/80 hover:bg-amber-100 text-slate-600 hover:text-amber-700 flex items-center justify-center transition-all active:scale-[0.94] border border-slate-200/60"
                       title="Zu Favoriten hinzufügen"
                     >
-                      <span className="material-symbols-outlined text-[16px]">
-                        bookmark_add
-                      </span>
+                      <Bookmark className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
@@ -257,11 +267,9 @@ export default function SchoolPhrasesView() {
           })
         ) : (
           <div className="text-center py-12 text-slate-400">
-            <span className="material-symbols-outlined text-[48px] text-slate-300 mb-2">
-              search_off
-            </span>
-            <p className="text-sm font-semibold">Keine Redemittel gefunden</p>
-            <p className="text-xs mt-1">Versuche einen anderen Suchbegriff oder eine andere Kategorie.</p>
+            <FileSearch className="w-10 h-10 text-slate-300 mx-auto mb-2 stroke-[1.5px]" />
+            <p className="text-sm font-semibold text-slate-600">Keine Redemittel gefunden</p>
+            <p className="text-xs mt-1 text-slate-400">Versuche einen anderen Suchbegriff oder eine andere Kategorie.</p>
           </div>
         )}
       </div>
