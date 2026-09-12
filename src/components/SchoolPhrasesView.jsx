@@ -152,21 +152,24 @@ export default function SchoolPhrasesView() {
       </div>
 
       {/* Category Pills */}
-      <div className="flex items-center gap-1.5 overflow-x-auto py-1 no-scrollbar -mx-4 px-4">
+      <div className="flex flex-wrap gap-1.5 py-0.5">
         {SCHOOL_CATEGORIES.map((cat) => {
           const isSelected = selectedCategory === cat.id;
           return (
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all shrink-0 ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                 isSelected
                   ? 'bg-school-blue text-white shadow-xs'
-                  : 'bg-white text-slate-600 border border-school-blue/15 hover:bg-school-blue/10'
+                  : 'bg-white text-slate-600 border border-school-blue/20 hover:bg-school-blue/5 hover:border-school-blue/40'
               }`}
             >
-              <span className="material-symbols-outlined text-[16px]">{cat.icon}</span>
-              <span>{cat.label}</span>
+              <span className={`material-symbols-outlined text-[16px] ${isSelected ? 'text-white' : 'text-school-blue'}`}>
+                {cat.icon}
+              </span>
+              <span className="sm:hidden">{cat.shortLabel || cat.label}</span>
+              <span className="hidden sm:inline">{cat.label}</span>
             </button>
           );
         })}

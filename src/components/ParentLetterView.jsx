@@ -182,17 +182,18 @@ export default function ParentLetterView({ isForcedOffline = false }) {
           </span>
           Fertige EduPage-Vorlagen (Sofort einfügen):
         </span>
-        <div className="flex items-center gap-2 overflow-x-auto py-1 no-scrollbar -mx-4 px-4">
+        <div className="flex flex-wrap gap-1.5 py-0.5">
           {PARENT_LETTER_TEMPLATES.map((tmpl) => (
             <button
               key={tmpl.id}
               onClick={() => handleSelectTemplate(tmpl)}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-school-blue/20 hover:border-school-blue text-slate-700 text-xs font-bold whitespace-nowrap shadow-xs hover:bg-school-blue/5 active:scale-95 transition-all shrink-0"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-school-blue/25 hover:border-school-blue text-slate-700 hover:text-school-blue text-xs font-bold shadow-xs hover:bg-school-blue/5 active:scale-95 transition-all"
             >
               <span className="material-symbols-outlined text-[16px] text-school-blue">
                 {tmpl.icon}
               </span>
-              <span>{tmpl.title}</span>
+              <span className="sm:hidden">{tmpl.shortTitle || tmpl.title}</span>
+              <span className="hidden sm:inline">{tmpl.title}</span>
             </button>
           ))}
         </div>

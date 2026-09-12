@@ -1,11 +1,11 @@
 export const SCHOOL_CATEGORIES = [
-  { id: 'all', label: 'Alle Redemittel', icon: 'auto_stories' },
-  { id: 'unterricht', label: 'Unterricht & Regeln', icon: 'school' },
-  { id: 'hausaufgaben', label: 'Hausaufgaben & Material', icon: 'backpack' },
-  { id: 'orga', label: 'Raum & Pause', icon: 'schedule' },
-  { id: 'mensa', label: 'Mensa & Essen', icon: 'restaurant' },
-  { id: 'gesundheit', label: 'Krankenstation & Sorgen', icon: 'medical_services' },
-  { id: 'eltern', label: 'Elternkontakt & Notizen', icon: 'mail' },
+  { id: 'all', label: 'Alle Redemittel', shortLabel: 'Alle', icon: 'auto_stories' },
+  { id: 'unterricht', label: 'Unterricht & Regeln', shortLabel: 'Unterricht', icon: 'school' },
+  { id: 'hausaufgaben', label: 'Hausaufgaben & Material', shortLabel: 'Hausaufgaben', icon: 'backpack' },
+  { id: 'orga', label: 'Raum & Pause', shortLabel: 'Raum & Pause', icon: 'schedule' },
+  { id: 'mensa', label: 'Mensa & Essen', shortLabel: 'Mensa', icon: 'restaurant' },
+  { id: 'gesundheit', label: 'Krankenstation & Sorgen', shortLabel: 'Krankenstation', icon: 'medical_services' },
+  { id: 'eltern', label: 'Elternkontakt & Notizen', shortLabel: 'Elternkontakt', icon: 'mail' },
 ];
 
 export const SCHOOL_PHRASES = [

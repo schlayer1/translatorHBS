@@ -2,6 +2,7 @@ export const PARENT_LETTER_TEMPLATES = [
   {
     id: 'elternsprechtag',
     title: 'Einladung zum Elterngespräch',
+    shortTitle: 'Elterngespräch',
     category: 'Termine',
     icon: 'calendar_month',
     de: `Liebe Eltern,\n\nwir möchten Sie herzlich zu einem persönlichen Entwicklungsgespräch über die schulischen Fortschritte Ihres Kindes an der Heimbürgeschule einladen.\n\nTermin: [Datum] um [Uhrzeit] Uhr in Raum [Raum-Nr.].\n\nBitte geben Sie uns kurz über EduPage Bescheid, ob Ihnen dieser Termin passt.\n\nMit freundlichen Grüßen,\n[Ihr Name / Klassenleitung]`,
@@ -12,16 +13,18 @@ export const PARENT_LETTER_TEMPLATES = [
   {
     id: 'entschuldigung',
     title: 'Krankmeldung & Fehltage',
+    shortTitle: 'Krankmeldung',
     category: 'Orga & Regeln',
     icon: 'assignment_late',
     de: `Sehr geehrte Eltern,\n\nIhr Kind hat in den letzten Tagen im Unterricht gefehlt. Bitte denken Sie daran, dass bei jeder Abwesenheit eine schriftliche Entschuldigung der Eltern erforderlich ist.\n\nBitte geben Sie Ihrem Kind morgen die unterschriebene Entschuldigung mit oder reichen Sie diese direkt über EduPage ein.\n\nVielen Dank für Ihre Unterstützung und gute Besserung!\n\nMit freundlichen Grüßen,\n[Klassenleitung]`,
     uk: `Шановні батьки,\n\nваша дитина була відсутня на заняттях останніми днями. Будь ласка, пам'ятайте, що при кожній відсутності потрібне письмове пояснення від батьків.\n\nБудь ласка, передайте дитині підписану довідку/записку завтра або надішліть її через EduPage.\n\nЩиро дякуємо за співпрацю та бажаємо міцного здоров'я!\n\nЗ повагою,\n[Класний керівник]`,
     ro: `Stimați părinți,\n\ncopilul dumneavoastră a lipsit de la ore în ultimele zile. Vă rugăm să rețineți că pentru orice absență este necesară o scutire scrisă din partea părinților.\n\nVă rugăm să trimiteți mâine scutirea semnată sau să o transmiteți direct prin EduPage.\n\nVă mulțumim pentru colaborare și însănătoșire grabnică!\n\nCu stimă,\n[Dirigintele]`,
-    hu: `Kedves Szülők!\n\nGyermekük az elmúlt napokban hiányzott az órákról. Kérjük, vegyék figyelembe, hogy minden hiányzást írásos szülői igazolással kell igazolni.\n\nKérjük, küldjék el holnap az aláírt igazolást, vagy nyújtsák be közvetlenül az EduPage rendszeren keresztül.\n\nKöszönjük együttműködésüket, és jobbulást kívánunk!\n\nÜdvözlettel,\n[Osztályfőnök]`,
+    hu: `Kedves Szülők!\n\nGyermekük az elmúlt napokban hiányzott az óráktól. Kérjük, vegyék figyelembe, hogy minden hiányzást írásos szülői igazolással kell igazolni.\n\nKérjük, küldjék el holnap az aláírt igazolást, vagy nyújtsák be közvetlenül az EduPage rendszeren keresztül.\n\nKöszönjük együttműködésüket, és jobbulást kívánunk!\n\nÜdvözlettel,\n[Osztályfőnök]`,
   },
   {
     id: 'ausflug',
     title: 'Wandertag & Schulausflug',
+    shortTitle: 'Wandertag',
     category: 'Veranstaltungen',
     icon: 'hiking',
     de: `Liebe Eltern,\n\nam [Datum] planen wir einen gemeinsamen Wandertag unserer Klasse. \n\nTreffpunkt: [Uhrzeit] Uhr am Schulhof der Heimbürgeschule.\nRückkehr: ca. [Uhrzeit] Uhr.\n\nBitte geben Sie Ihrem Kind wetterfeste Kleidung, feste Schuhe und ein kleines Lunchpaket mit ausreichend Trinkwasser mit. Fahrgeld/Kosten: [Betrag] Euro.\n\nWir freuen uns auf einen schönen Tag!\n\nHerzliche Grüße,\n[Klassenleitung]`,
@@ -32,6 +35,7 @@ export const PARENT_LETTER_TEMPLATES = [
   {
     id: 'material',
     title: 'Fehlendes Arbeitsmaterial',
+    shortTitle: 'Material fehlt',
     category: 'Unterricht',
     icon: 'draw',
     de: `Liebe Eltern,\n\nIhrem Kind fehlt im Unterricht derzeit folgendes Arbeitsmaterial: [z. B. Lineal, Zeichenheft, Kleber].\n\nDamit Ihr Kind erfolgreich am Unterricht teilnehmen kann, bitten wir Sie, diese Dinge bis [Wochentag] zu besorgen und mit in die Schule zu geben.\n\nVielen Dank für Ihre Mithilfe!\n\nHerzliche Grüße,\n[Fachlehrkraft / Klassenleitung]`,
@@ -42,6 +46,7 @@ export const PARENT_LETTER_TEMPLATES = [
   {
     id: 'lob',
     title: 'Besonderes Lob & Lernerfolg',
+    shortTitle: 'Lob & Erfolg',
     category: 'Wertschätzung',
     icon: 'hotel_class',
     de: `Liebe Eltern,\n\nich möchte Ihnen heute eine erfreuliche Rückmeldung geben: Ihr Kind hat sich in der letzten Zeit sehr bemüht und große Fortschritte gemacht. Auch das Verhalten in der Klassengemeinschaft war vorbildlich!\n\nWir freuen uns sehr über diese tolle Entwicklung.\n\nHerzliche Grüße,\n[Klassenleitung]`,
