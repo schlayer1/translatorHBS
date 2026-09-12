@@ -338,7 +338,7 @@ export default function TranslatorView({ onOpenDialogue, isForcedOffline = false
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs font-mono tabular-nums font-semibold px-2 py-0.5 rounded-md bg-slate-100/80 text-slate-500 border border-slate-200/60">
-              {sourceText.length} / 500
+              {sourceText.length} Zeichen
             </span>
             {sourceText && (
               <button

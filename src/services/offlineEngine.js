@@ -121,15 +121,9 @@ export const offlineEngine = {
       };
     }
 
-    // 4. If phrase isn't known yet offline: provide friendly offline prompt & phonetic aid
-    const fallbackMessage = targetLang === 'uk' 
-      ? `[Offline-Modus]: "${text}" (Bitte Redemittel-Katalog nutzen oder bei WLAN-Verbindung erneut versuchen)`
-      : targetLang === 'ro'
-      ? `[Mod Offline]: "${text}"`
-      : `[Offline Mód]: "${text}"`;
-
+    // 4. If phrase isn't known yet offline: return text without [Offline-Modus] prefix
     return {
-      translation: fallbackMessage,
+      translation: text,
       phonetic: targetLang === 'uk' ? speechService.generatePhoneticAid(text, 'uk') : '',
       source: 'offline_fallback',
       matchQuality: 'basic',

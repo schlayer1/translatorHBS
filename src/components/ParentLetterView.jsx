@@ -117,13 +117,25 @@ export default function ParentLetterView({ isForcedOffline = false }) {
       const settings = storageService.getSettings();
       const apiKey = settings.apiKey;
 
+      if (!apiKey && !isForcedOffline && (typeof navigator !== 'undefined' && navigator.onLine)) {
+        // Free online translation fallback
+        const flag = targetLangObj.flag;
+        const translated = await translationManager.translateFreeOnline({ text: draftText, sourceLang: 'de', targetLang });
+        setPolishedGerman(draftText);
+        setTranslatedLetter(translated);
+        setBilingualText(`🇩🇪 [Deutsche Mitteilung für EduPage]\n${draftText}\n\n────────────────────────────────────\n${flag} [${targetLangObj.name} / Übersetzung für die Familie]\n${translated}`);
+        setWritingTip('Tipp: Für erweiterte Formulierungshilfen (DeepL-Write-Stil) kann in den Optionen ein kostenloser Gemini-Key eingetragen werden.');
+        setIsLoading(false);
+        return;
+      }
+
       if (!apiKey || isForcedOffline || (typeof navigator !== 'undefined' && !navigator.onLine)) {
         // Offline Fallback: Find closest template or create basic bilingual export
         const flag = targetLangObj.flag;
         setPolishedGerman(draftText);
-        setTranslatedLetter(`[Hinweis: Ohne Internetzugang/API-Key steht die manuelle Vorlagen-Bibliothek zur Verfügung. Bitte nutzen Sie die fertigen Vorlagen oben.]`);
-        setBilingualText(`🇩🇪 [Deutsche Mitteilung für EduPage]\n${draftText}\n\n────────────────────────────────────\n${flag} [${targetLangObj.name} / Übersetzung]\n[Bitte bei aktiver Online-KI generieren oder Vorlage oben wählen]`);
-        setErrorMessage('Tipp: Trage in den Optionen einen kostenlosen Gemini-Key ein, um die DeepL-Write-Textoptimierung zu aktivieren.');
+        setTranslatedLetter(`[Offline: Bitte nutze bei fehlender Internetverbindung die vorgefertigten Vorlagen oben.]`);
+        setBilingualText(`🇩🇪 [Deutsche Mitteilung für EduPage]\n${draftText}\n\n────────────────────────────────────\n${flag} [${targetLangObj.name} / Übersetzung]\n[Bitte bei Internetverbindung generieren oder Vorlage oben wählen]`);
+        setErrorMessage('Hinweis: Ohne Internetverbindung können freie Texte nicht übersetzt werden.');
         setIsLoading(false);
         return;
       }

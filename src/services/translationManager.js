@@ -3,10 +3,36 @@ import { offlineEngine } from './offlineEngine';
 import { storageService } from './storageService';
 import { speechService } from './speechService';
 
+function decodeHtmlEntities(str) {
+  if (!str) return '';
+  return str
+    .replace(/&#39;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>');
+}
+
 export const translationManager = {
   // Test connection or determine current active mode
   isOnline() {
     return typeof navigator !== 'undefined' && navigator.onLine;
+  },
+
+  // Free online translation fallback (works without API key)
+  async translateFreeOnline({ text, sourceLang, targetLang }) {
+    const src = sourceLang.split('-')[0].toLowerCase();
+    const tgt = targetLang.split('-')[0].toLowerCase();
+    const langpair = `${src}|${tgt}`;
+    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text.trim())}&langpair=${langpair}`;
+    
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    if (data.responseStatus === 200 && data.responseData?.translatedText) {
+      return decodeHtmlEntities(data.responseData.translatedText);
+    }
+    throw new Error(data.responseDetails || 'Translation failed');
   },
 
   async translate({ text, sourceLang, targetLang, simplified = false, isSpokenInput = false, forceOffline = false }) {
@@ -56,8 +82,43 @@ export const translationManager = {
           pedagogicalTip: geminiRes.pedagogicalTip || '',
         };
       } catch (err) {
-        console.warn('Online Gemini translation failed, falling back to offline engine:', err.message);
-        // Fallback to offline engine
+        console.warn('Online Gemini translation failed, attempting free online translation fallback:', err.message);
+        try {
+          const freeTranslation = await this.translateFreeOnline({ text, sourceLang, targetLang });
+          result = {
+            translation: freeTranslation,
+            phonetic: targetLang === 'uk' ? speechService.generatePhoneticAid(freeTranslation, 'uk') : '',
+            isOffline: false,
+            engine: 'Online-Übersetzung (Direkt)',
+          };
+        } catch (freeErr) {
+          const offlineRes = offlineEngine.translate({
+            text,
+            sourceLang,
+            targetLang,
+            simplified,
+          });
+
+          result = {
+            translation: offlineRes.translation,
+            phonetic: offlineRes.phonetic,
+            isOffline: true,
+            engine: 'Geräte-KI (Offline)',
+          };
+        }
+      }
+    } else if (online) {
+      // 2. Online without Gemini API key: use free online translation
+      try {
+        const freeTranslation = await this.translateFreeOnline({ text, sourceLang, targetLang });
+        result = {
+          translation: freeTranslation,
+          phonetic: targetLang === 'uk' ? speechService.generatePhoneticAid(freeTranslation, 'uk') : '',
+          isOffline: false,
+          engine: 'Online-Übersetzung',
+        };
+      } catch (freeErr) {
+        console.warn('Free online translation failed, falling back to offline dictionary:', freeErr);
         const offlineRes = offlineEngine.translate({
           text,
           sourceLang,
@@ -69,12 +130,11 @@ export const translationManager = {
           translation: offlineRes.translation,
           phonetic: offlineRes.phonetic,
           isOffline: true,
-          engine: 'Geräte-KI (Offline Fallback)',
-          errorHint: 'Online-KI nicht erreichbar. Lokales Schul-Lexikon verwendet.',
+          engine: 'Geräte-KI (Offline)',
         };
       }
     } else {
-      // 2. Offline Mode directly
+      // 3. Offline Mode directly (WLAN aus oder Offline erzwungen)
       const offlineRes = offlineEngine.translate({
         text,
         sourceLang,
@@ -86,7 +146,7 @@ export const translationManager = {
         translation: offlineRes.translation,
         phonetic: offlineRes.phonetic,
         isOffline: true,
-        engine: 'Geräte-KI (100% Offline)',
+        engine: 'Geräte-KI (Offline)',
       };
     }
 
