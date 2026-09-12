@@ -308,7 +308,7 @@ export default function ParentLetterView({ isForcedOffline = false }) {
             ) : (
               <>
                 <Sparkles className="w-4 h-4" />
-                <span>KI-Schliff & Übersetzung</span>
+                <span>KI-basierte Übersetzung</span>
               </>
             )}
           </button>
