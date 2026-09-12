@@ -457,10 +457,6 @@ export default function TranslatorView({ onOpenDialogue, isForcedOffline = false
             <span className="text-sm font-bold text-slate-900">
               {currentTargetObj.flag} {currentTargetObj.name}
             </span>
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 border border-emerald-500/20 text-[11px] font-semibold">
-              <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-              <span>Schulzertifiziert</span>
-            </span>
           </div>
 
           <div className="flex items-center gap-1">

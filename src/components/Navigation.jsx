@@ -3,7 +3,7 @@ import { Languages, Mail, MessagesSquare, BookOpen, SlidersHorizontal } from 'lu
 
 const TABS = [
   { id: 'translate', label: 'Übersetzen', icon: Languages },
-  { id: 'parentLetter', label: 'Elternbrief', icon: Mail, badge: 'EduPage' },
+  { id: 'parentLetter', label: 'Elternbrief', icon: Mail },
   { id: 'dialogue', label: '2-Wege', icon: MessagesSquare, badge: 'Live' },
   { id: 'phrases', label: 'Redemittel', icon: BookOpen },
   { id: 'settings', label: 'Optionen', icon: SlidersHorizontal },

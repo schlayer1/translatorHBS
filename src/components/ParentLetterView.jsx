@@ -181,14 +181,11 @@ export default function ParentLetterView({ isForcedOffline = false }) {
           <div className="flex items-center gap-2">
             <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
               <Mail className="w-5 h-5 text-school-blue" />
-              <span>Elternbriefe & EduPage</span>
+              <span>Elternbriefe</span>
             </h1>
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 text-[10px] font-bold uppercase tracking-wider border border-emerald-500/20">
-              EduPage Ready
-            </span>
           </div>
           <p className="text-xs text-slate-400 mt-0.5">
-            Schultexte auf DeepL-Write-Niveau veredeln & zweisprachig in EduPage einfügen
+            Schultexte veredeln & zweisprachig ausgeben
           </p>
         </div>
 
