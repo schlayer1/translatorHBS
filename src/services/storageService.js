@@ -3,6 +3,7 @@ const STORAGE_KEYS = {
   HISTORY: 'heimbuerge_translator_history_v1',
   SETTINGS: 'heimbuerge_translator_settings_v1',
   OFFLINE_PACKS: 'heimbuerge_translator_offline_packs_v1',
+  CUSTOM_PHRASES: 'heimbuerge_translator_custom_phrases_v1',
 };
 
 const DEFAULT_SETTINGS = {
@@ -123,6 +124,46 @@ export const storageService = {
       localStorage.setItem(STORAGE_KEYS.OFFLINE_PACKS, JSON.stringify(current));
     } catch (e) {
       console.error('Error saving offline pack status', e);
+    }
+  },
+
+  getCustomPhrases() {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.CUSTOM_PHRASES);
+      return data ? JSON.parse(data) : [];
+    } catch (e) {
+      console.error('Error reading custom phrases', e);
+      return [];
+    }
+  },
+
+  saveCustomPhrase(phrase) {
+    try {
+      const current = this.getCustomPhrases();
+      const newPhrase = {
+        ...phrase,
+        id: phrase.id || `custom_${Date.now()}`,
+        isCustom: true,
+        createdAt: new Date().toISOString()
+      };
+      const updated = [newPhrase, ...current];
+      localStorage.setItem(STORAGE_KEYS.CUSTOM_PHRASES, JSON.stringify(updated));
+      return newPhrase;
+    } catch (e) {
+      console.error('Error saving custom phrase', e);
+      return null;
+    }
+  },
+
+  deleteCustomPhrase(id) {
+    try {
+      const current = this.getCustomPhrases();
+      const updated = current.filter(p => p.id !== id);
+      localStorage.setItem(STORAGE_KEYS.CUSTOM_PHRASES, JSON.stringify(updated));
+      return true;
+    } catch (e) {
+      console.error('Error deleting custom phrase', e);
+      return false;
     }
   }
 };

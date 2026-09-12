@@ -36,7 +36,7 @@ const CONTEXT_TEMPLATES = [
   { label: 'Krankenstation', icon: '🩺', text: 'Geht es dir nicht gut? Wo tut es weh? Wir rufen deine Eltern an.' },
 ];
 
-export default function TranslatorView({ onOpenDialogue, isForcedOffline = false }) {
+export default function TranslatorView({ onOpenDialogue, isForcedOffline = false, initialPreset = null, onClearPreset }) {
   const [sourceLang, setSourceLang] = useState('de');
   const [targetLang, setTargetLang] = useState('uk');
   const [sourceText, setSourceText] = useState('Bitte denkt daran, morgen euer Zeichenheft und Buntstifte mitzubringen.');
@@ -58,13 +58,23 @@ export default function TranslatorView({ onOpenDialogue, isForcedOffline = false
   const recognizerRef = useRef(null);
   const translationTimeoutRef = useRef(null);
 
+  // Handle incoming preset from Redemittel
+  useEffect(() => {
+    if (initialPreset) {
+      if (initialPreset.sourceText !== undefined) setSourceText(initialPreset.sourceText);
+      if (initialPreset.targetLang) setTargetLang(initialPreset.targetLang);
+      setSourceLang('de');
+      if (onClearPreset) onClearPreset();
+    }
+  }, [initialPreset]);
+
   // Load saved preferences
   useEffect(() => {
     const settings = storageService.getSettings();
     setSpeechSpeed(settings.playbackSpeed || 1.0);
     setSimplified(settings.simplifiedLanguage || false);
     setPedagogicalTone(settings.pedagogicalTone || 'student');
-    if (settings.preferredPair) {
+    if (settings.preferredPair && !initialPreset) {
       setTargetLang(settings.preferredPair);
     }
   }, []);

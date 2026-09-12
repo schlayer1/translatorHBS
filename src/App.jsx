@@ -12,6 +12,12 @@ import { storageService } from './services/storageService';
 export default function App() {
   const [currentTab, setCurrentTab] = useState('translate');
   const [isForcedOffline, setIsForcedOffline] = useState(false);
+  const [translatorPreset, setTranslatorPreset] = useState(null);
+
+  const handleTransferToTranslator = ({ sourceText, targetLang }) => {
+    setTranslatorPreset({ sourceText, targetLang });
+    setCurrentTab('translate');
+  };
 
   return (
     <div className="min-h-screen bg-[#FFFBF5] text-slate-800 flex flex-col font-sans selection:bg-orange-200">
@@ -28,6 +34,8 @@ export default function App() {
           <TranslatorView
             onOpenDialogue={() => setCurrentTab('dialogue')}
             isForcedOffline={isForcedOffline}
+            initialPreset={translatorPreset}
+            onClearPreset={() => setTranslatorPreset(null)}
           />
         )}
         {currentTab === 'parentLetter' && (
@@ -41,7 +49,9 @@ export default function App() {
           />
         )}
         {currentTab === 'phrases' && (
-          <SchoolPhrasesView />
+          <SchoolPhrasesView
+            onTransferToTranslator={handleTransferToTranslator}
+          />
         )}
         {currentTab === 'saved' && (
           <SavedPhrasesView />

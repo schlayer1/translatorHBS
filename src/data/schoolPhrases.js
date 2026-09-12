@@ -6,6 +6,7 @@ export const SCHOOL_CATEGORIES = [
   { id: 'mensa', label: 'Mensa & Essen', shortLabel: 'Mensa', icon: 'restaurant' },
   { id: 'gesundheit', label: 'Krankenstation & Sorgen', shortLabel: 'Krankenstation', icon: 'medical_services' },
   { id: 'eltern', label: 'Elternkontakt & Notizen', shortLabel: 'Elternkontakt', icon: 'mail' },
+  { id: 'custom', label: 'Eigene Vorlagen', shortLabel: 'Eigene', icon: 'sparkles' },
 ];
 
 export const SCHOOL_PHRASES = [
