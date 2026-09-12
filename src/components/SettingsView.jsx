@@ -403,32 +403,6 @@ export default function SettingsView({ isForcedOffline, onToggleForceOffline }) 
               </div>
             </div>
           )}
-
-          <div className="flex items-start gap-1.5 pt-1 text-[11px] text-slate-600 bg-white/80 p-2 rounded-lg border border-slate-200/60">
-            <span className="material-symbols-outlined text-[16px] text-school-teal shrink-0 mt-0.5">tips_and_updates</span>
-            <span>
-              <strong>KI-Spracheingabe & DaZ-Filter:</strong> Beim Sprechen ins Mikrofon filtert Google Gemini Hintergrundgeräusche und gleicht Hörfehler sowie Akzente von DaZ-Schülern automatisch sinngemäß aus.
-            </span>
-          </div>
-
-          {/* Apple iPad / iPhone HD Voices Guide */}
-          <div className="bg-amber-50/80 border border-amber-200 rounded-xl p-3 text-xs text-amber-950 flex flex-col gap-1.5">
-            <div className="flex items-center gap-1.5 font-bold text-amber-900">
-              <span className="material-symbols-outlined text-[18px] text-amber-700">hearing</span>
-              <span>Tipp für Schul-iPads & iPhones: Apple HD-Stimmen aktivieren (auch offline)</span>
-            </div>
-            <p className="text-[11px] text-amber-900/90 leading-relaxed">
-              Apple installiert ab Werk nur speichersparende Kompaktstimmen (klingen blechern/roboterhaft). So aktivierst du kostenlos Apples echte menschliche HD-Stimmen:
-            </p>
-            <ol className="list-decimal list-inside text-[11px] text-amber-900 space-y-0.5 pl-1 font-medium">
-              <li>Öffne am iPad die <strong>Einstellungen</strong> &gt; <strong>Bedienungshilfen</strong>.</li>
-              <li>Wähle <strong>Gesprochene Inhalte</strong> &gt; <strong>Stimmen</strong>.</li>
-              <li>Tippe auf die Sprache (z. B. <em>Deutsch</em> oder <em>Ukrainisch</em>) und lade <strong>„Erweitert“</strong> oder <strong>„Siri“</strong> (z. B. <em>Anna (Erweitert)</em> oder <em>Lesya (Erweitert)</em>) herunter.</li>
-            </ol>
-            <p className="text-[10px] text-amber-800 italic pt-0.5">
-              Sobald geladen, spricht das iPad komplett ohne Roboterklang – selbst mitten im Funkloch ohne WLAN!
-            </p>
-          </div>
         </div>
       </div>
 

@@ -337,12 +337,6 @@ export default function TranslatorView({ onOpenDialogue, isForcedOffline = false
             </span>
           </div>
           <div className="flex items-center gap-2">
-            {isSpokenInput && (
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 border border-amber-500/20 flex items-center gap-1">
-                <Mic className="w-3 h-3 text-amber-600" />
-                KI-Akzent-Filter aktiv
-              </span>
-            )}
             <span className="text-xs font-mono tabular-nums font-semibold px-2 py-0.5 rounded-md bg-slate-100/80 text-slate-500 border border-slate-200/60">
               {sourceText.length} / 500
             </span>

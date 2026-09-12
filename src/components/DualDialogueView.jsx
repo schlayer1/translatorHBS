@@ -315,7 +315,7 @@ export default function DualDialogueView({ isForcedOffline = false }) {
                   <div className="pt-1">
                     <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-school-blue border border-blue-200 shadow-2xs">
                       <span className="material-symbols-outlined text-[12px]">mic</span>
-                      Spracheingabe (KI-Akzent-Korrektur)
+                      Spracheingabe
                     </span>
                   </div>
                 )}
