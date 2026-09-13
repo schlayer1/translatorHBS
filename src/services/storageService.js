@@ -4,6 +4,7 @@ const STORAGE_KEYS = {
   SETTINGS: 'heimbuerge_translator_settings_v1',
   OFFLINE_PACKS: 'heimbuerge_translator_offline_packs_v1',
   CUSTOM_PHRASES: 'heimbuerge_translator_custom_phrases_v1',
+  ONBOARDING_SEEN: 'heimbuerge_translator_onboarding_seen_v1',
 };
 
 const DEFAULT_SETTINGS = {
@@ -164,6 +165,22 @@ export const storageService = {
     } catch (e) {
       console.error('Error deleting custom phrase', e);
       return false;
+    }
+  },
+
+  isOnboardingSeen() {
+    try {
+      return localStorage.getItem(STORAGE_KEYS.ONBOARDING_SEEN) === 'true';
+    } catch (e) {
+      return false;
+    }
+  },
+
+  setOnboardingSeen(seen = true) {
+    try {
+      localStorage.setItem(STORAGE_KEYS.ONBOARDING_SEEN, seen ? 'true' : 'false');
+    } catch (e) {
+      console.error('Error saving onboarding status', e);
     }
   }
 };

@@ -4,7 +4,7 @@ import { geminiService } from '../services/geminiService';
 import { speechService } from '../services/speechService';
 import { SUPPORTED_LANGUAGES } from '../data/languages';
 
-export default function SettingsView({ isForcedOffline, onToggleForceOffline }) {
+export default function SettingsView({ isForcedOffline, onToggleForceOffline, onOpenOnboarding }) {
   const [apiKey, setApiKey] = useState('');
   const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
   const [autoPronounce, setAutoPronounce] = useState(false);
@@ -104,14 +104,26 @@ export default function SettingsView({ isForcedOffline, onToggleForceOffline }) 
   return (
     <div className="flex flex-col w-full max-w-4xl mx-auto px-4 pt-20 pb-28 gap-5">
       {/* Header */}
-      <div>
-        <h1 className="text-xl font-extrabold text-school-blue flex items-center gap-1.5">
-          <span className="material-symbols-outlined text-[24px]">settings</span>
-          Optionen & Offline-Verwaltung
-        </h1>
-        <p className="text-xs text-slate-500">
-          Konfiguration für die Heimbürgeschule Kahla
-        </p>
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <div>
+          <h1 className="text-xl font-extrabold text-school-blue flex items-center gap-1.5">
+            <span className="material-symbols-outlined text-[24px]">settings</span>
+            Optionen & Offline-Verwaltung
+          </h1>
+          <p className="text-xs text-slate-500">
+            Konfiguration für die Heimbürgeschule Kahla
+          </p>
+        </div>
+
+        {onOpenOnboarding && (
+          <button
+            onClick={onOpenOnboarding}
+            className="h-9 px-3 rounded-xl bg-school-blue/10 hover:bg-school-blue/20 text-school-blue font-bold text-xs flex items-center gap-1.5 transition-all active:scale-[0.96] border border-school-blue/20"
+          >
+            <span className="material-symbols-outlined text-[16px]">info</span>
+            <span>Begrüßungsbildschirm</span>
+          </button>
+        )}
       </div>
 
       {/* School Badge Card */}

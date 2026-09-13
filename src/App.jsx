@@ -7,12 +7,22 @@ import SchoolPhrasesView from './components/SchoolPhrasesView';
 import SavedPhrasesView from './components/SavedPhrasesView';
 import SettingsView from './components/SettingsView';
 import ParentLetterView from './components/ParentLetterView';
+import OnboardingModal from './components/OnboardingModal';
 import { storageService } from './services/storageService';
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState('translate');
   const [isForcedOffline, setIsForcedOffline] = useState(false);
   const [translatorPreset, setTranslatorPreset] = useState(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  useEffect(() => {
+    // Show onboarding if never seen
+    const seen = storageService.isOnboardingSeen();
+    if (!seen) {
+      setShowOnboarding(true);
+    }
+  }, []);
 
   const handleTransferToTranslator = ({ sourceText, targetLang }) => {
     setTranslatorPreset({ sourceText, targetLang });
@@ -61,6 +71,7 @@ export default function App() {
             isForcedOffline={isForcedOffline}
             onToggleForceOffline={() => setIsForcedOffline(!isForcedOffline)}
             onOpenSaved={() => setCurrentTab('saved')}
+            onOpenOnboarding={() => setShowOnboarding(true)}
           />
         )}
       </main>
@@ -69,6 +80,12 @@ export default function App() {
       <Navigation
         currentTab={currentTab}
         onSelectTab={setCurrentTab}
+      />
+
+      {/* Welcome / Onboarding Modal (First launch & manual from Options) */}
+      <OnboardingModal
+        isOpen={showOnboarding}
+        onClose={() => setShowOnboarding(false)}
       />
     </div>
   );
