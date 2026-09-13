@@ -168,6 +168,7 @@ export default function SchoolPhrasesView({ onTransferToTranslator }) {
       const german = newGermanText.trim();
       let ukText = '';
       let ruText = '';
+      let enText = '';
       let roText = '';
       let huText = '';
 
@@ -183,6 +184,13 @@ export default function SchoolPhrasesView({ onTransferToTranslator }) {
         ruText = resRu || '';
       } catch (err) {
         console.warn('RU translation failed', err);
+      }
+
+      try {
+        const resEn = await translationManager.translateFreeOnline({ text: german, sourceLang: 'de', targetLang: 'en' });
+        enText = resEn || '';
+      } catch (err) {
+        console.warn('EN translation failed', err);
       }
 
       try {
@@ -204,6 +212,7 @@ export default function SchoolPhrasesView({ onTransferToTranslator }) {
         category: newCategory,
         uk: ukText,
         ru: ruText,
+        en: enText,
         ro: roText,
         hu: huText,
       });

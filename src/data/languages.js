@@ -60,11 +60,24 @@ export const BUILTIN_LANGUAGES = [
     hasPhonetics: true,
     isBuiltin: true,
   },
+  {
+    code: 'en',
+    name: 'Englisch',
+    nativeName: 'English',
+    flag: '🇬🇧',
+    speechCode: 'en-US',
+    greeting: 'Hello',
+    description: 'Schüler & Eltern',
+    placeholder: 'Type a message or speak...',
+    hasPhonetics: false,
+    isBuiltin: true,
+  },
 ];
 
 export const FREQUENT_PAIRS = [
   { source: 'de', target: 'uk', label: 'DE ⇄ UKR', flagTarget: '🇺🇦' },
   { source: 'de', target: 'ru', label: 'DE ⇄ RU', flagTarget: '🇷🇺' },
+  { source: 'de', target: 'en', label: 'DE ⇄ EN', flagTarget: '🇬🇧' },
   { source: 'de', target: 'ro', label: 'DE ⇄ RO', flagTarget: '🇷🇴' },
   { source: 'de', target: 'hu', label: 'DE ⇄ HU', flagTarget: '🇭🇺' },
 ];

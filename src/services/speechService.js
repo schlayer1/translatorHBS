@@ -58,6 +58,9 @@ function scoreVoice(voice, targetLangPrefix) {
   if (targetLangPrefix === 'ru' && (name.includes('milena') || name.includes('yuri') || name.includes('dmitry') || name.includes('tatyana') || name.includes('katya'))) {
     score += 30;
   }
+  if (targetLangPrefix === 'en' && (name.includes('samantha') || name.includes('daniel') || name.includes('karen') || name.includes('serena') || name.includes('oliver') || name.includes('ava') || name.includes('tom'))) {
+    score += 30;
+  }
   if (targetLangPrefix === 'ro' && (name.includes('ioana') || name.includes('alex') || name.includes('andrei') || name.includes('carmen'))) {
     score += 30;
   }
@@ -352,6 +355,7 @@ export const speechService = {
     de: 'Guten Tag, herzlich willkommen an der Staatlichen Regelschule Heimbürgeschule Kahla!',
     uk: 'Доброго дня! Ласкаво просимо до школи Heimbürgeschule.',
     ru: 'Здравствуйте! Добро пожаловать в школу Heimbürgeschule.',
+    en: 'Hello! Welcome to Heimbürgeschule.',
     ro: 'Bună ziua! Bine ați venit la școala Heimbürgeschule.',
     hu: 'Jó napot kívánok! Üdvözöljük a Heimbürgeschule iskolában.',
   },

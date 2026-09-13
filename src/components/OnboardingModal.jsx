@@ -130,10 +130,10 @@ export default function OnboardingModal({ isOpen, onClose, onApiKeySaved }) {
                     <div className="w-6 h-6 rounded-lg bg-school-blue/10 flex items-center justify-center">
                       <Languages className="w-3.5 h-3.5 text-school-blue" />
                     </div>
-                    <span>5 feste Schulsprachen</span>
+                    <span>6 feste Schulsprachen</span>
                   </div>
                   <p className="text-[11px] text-slate-500 leading-normal">
-                    🇺🇦 Ukrainisch, 🇷🇺 Russisch, 🇷🇴 Rumänisch und 🇭🇺 Ungarisch sind mit Redemitteln und Lautschrift fest im System – 100% offline einsatzbereit.
+                    🇺🇦 Ukrainisch, 🇷🇺 Russisch, 🇬🇧 Englisch, 🇷🇴 Rumänisch und 🇭🇺 Ungarisch sind mit Redemitteln fest im System – 100% offline einsatzbereit.
                   </p>
                 </div>
 

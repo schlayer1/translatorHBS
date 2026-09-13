@@ -12,7 +12,6 @@ const POPULAR_LANGUAGES_CATALOG = [
   { code: 'fa', name: 'Farsi / Dari', nativeName: 'فارسی', flag: '🇮🇷', speechCode: 'fa-IR', greeting: 'سلام', placeholder: 'پیامی بنویسید...' },
   { code: 'tr', name: 'Türkisch', nativeName: 'Türkçe', flag: '🇹🇷', speechCode: 'tr-TR', greeting: 'Merhaba', placeholder: 'Bir mesaj yazın...' },
   { code: 'pl', name: 'Polnisch', nativeName: 'Polski', flag: '🇵🇱', speechCode: 'pl-PL', greeting: 'Dzień dobry', placeholder: 'Wpisz wiadomość...' },
-  { code: 'en', name: 'Englisch', nativeName: 'English', flag: '🇬🇧', speechCode: 'en-US', greeting: 'Hello', placeholder: 'Type a message...' },
   { code: 'vi', name: 'Vietnamesisch', nativeName: 'Tiếng Việt', flag: '🇻🇳', speechCode: 'vi-VN', greeting: 'Xin chào', placeholder: 'Nhập tin nhắn...' },
   { code: 'sq', name: 'Albanisch', nativeName: 'Shqip', flag: '🇦🇱', speechCode: 'sq-AL', greeting: 'Përshëndetje', placeholder: 'Shkruani një mesazh...' },
 ];
@@ -25,7 +24,7 @@ export default function SettingsView({ isForcedOffline, onToggleForceOffline, on
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
   const [testResult, setTestResult] = useState(null);
-  const [offlinePacks, setOfflinePacks] = useState({ uk: true, ro: true, hu: true, ru: true });
+  const [offlinePacks, setOfflinePacks] = useState({ uk: true, ro: true, hu: true, ru: true, en: true });
   const [playingVoiceLang, setPlayingVoiceLang] = useState(null);
   const [voiceStatus, setVoiceStatus] = useState(null);
   const [voicesTick, setVoicesTick] = useState(0);
@@ -681,11 +680,12 @@ export default function SettingsView({ isForcedOffline, onToggleForceOffline, on
             Die App nutzt online Googles offizielle HD-Sprach-Engine für natürliche, wohlklingende Aussprache ohne Roboterklang. Offline greift sie automatisch auf die beste Systemstimme deines Geräts zu:
           </p>
 
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-1">
+          <div className="grid grid-cols-2 sm:grid-cols-6 gap-2 pt-1">
             {[
               { key: 'de', code: 'de-DE', label: 'Deutsch', flag: '🇩🇪' },
               { key: 'uk', code: 'uk-UA', label: 'Ukrainisch', flag: '🇺🇦' },
               { key: 'ru', code: 'ru-RU', label: 'Russisch', flag: '🇷🇺' },
+              { key: 'en', code: 'en-US', label: 'Englisch', flag: '🇬🇧' },
               { key: 'ro', code: 'ro-RO', label: 'Rumänisch', flag: '🇷🇴' },
               { key: 'hu', code: 'hu-HU', label: 'Ungarisch', flag: '🇭🇺' },
             ].map((item) => {
