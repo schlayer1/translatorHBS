@@ -449,23 +449,18 @@ export default function TranslatorView({ onOpenDialogue, isForcedOffline = false
               </button>
             </div>
 
-            {/* Manual Translate Trigger Button */}
+            {/* Manual Translate Trigger Button (Icon-only to fit iPhone display width) */}
             <button
               onClick={handleTranslateClick}
               disabled={isTranslating || !sourceText.trim()}
-              className="h-9 px-3.5 rounded-xl bg-school-blue hover:bg-school-blueDark text-white font-bold text-xs shadow-xs active:scale-[0.96] transition-all flex items-center gap-1.5 disabled:opacity-40"
+              aria-label="Übersetzen"
+              className="w-9 h-9 rounded-xl bg-school-blue hover:bg-school-blueDark text-white shadow-xs active:scale-[0.92] transition-all flex items-center justify-center disabled:opacity-40"
               title="Übersetzung starten (Enter)"
             >
               {isTranslating ? (
-                <>
-                  <span className="w-3 h-3 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
-                  <span>Übersetze...</span>
-                </>
+                <span className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
               ) : (
-                <>
-                  <Languages className="w-3.5 h-3.5" />
-                  <span>Übersetzen</span>
-                </>
+                <Languages className="w-4 h-4" />
               )}
             </button>
           </div>
