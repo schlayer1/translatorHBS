@@ -603,7 +603,14 @@ export default function TranslatorView({ onOpenDialogue, isForcedOffline = false
       </div>
 
       {/* 5. Classroom 2-Way Dialog Banner */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-school-blue to-school-teal text-white rounded-2xl p-4 shadow-sm border border-school-blue/20">
+      <div 
+        onClick={onOpenDialogue}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onOpenDialogue?.(); }}
+        className="relative overflow-hidden bg-gradient-to-r from-school-blue to-school-teal text-white rounded-2xl p-4 shadow-sm border border-school-blue/20 cursor-pointer select-none active:scale-[0.98] hover:shadow-md transition-all"
+        title="Zum 2-Wege-Gespräch wechseln"
+      >
         <div className="flex items-center justify-between gap-3 relative z-10">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-white/15 border border-white/25 flex items-center justify-center shrink-0">
@@ -624,8 +631,12 @@ export default function TranslatorView({ onOpenDialogue, isForcedOffline = false
             </div>
           </div>
           <button
-            onClick={onOpenDialogue}
-            className="h-8.5 px-3.5 rounded-xl bg-white text-school-blue hover:bg-slate-50 text-xs font-bold flex items-center gap-1 shadow-xs active:scale-[0.96] transition-all shrink-0"
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpenDialogue?.();
+            }}
+            className="h-8.5 px-3.5 rounded-xl bg-white text-school-blue hover:bg-slate-50 text-xs font-bold flex items-center gap-1 shadow-xs active:scale-[0.96] transition-all shrink-0 cursor-pointer"
           >
             <span>Starten</span>
             <ArrowRight className="w-3.5 h-3.5" />
