@@ -76,7 +76,7 @@ export const translationManager = {
 
         result = {
           translation: geminiRes.translation,
-          phonetic: geminiRes.phonetic || (targetLang === 'uk' ? speechService.generatePhoneticAid(geminiRes.translation, 'uk') : ''),
+          phonetic: geminiRes.phonetic || ((targetLang === 'uk' || targetLang === 'ru') ? speechService.generatePhoneticAid(geminiRes.translation, targetLang) : ''),
           isOffline: false,
           engine: `${modelName} (${toneName})`,
           pedagogicalTip: geminiRes.pedagogicalTip || '',
@@ -87,7 +87,7 @@ export const translationManager = {
           const freeTranslation = await this.translateFreeOnline({ text, sourceLang, targetLang });
           result = {
             translation: freeTranslation,
-            phonetic: targetLang === 'uk' ? speechService.generatePhoneticAid(freeTranslation, 'uk') : '',
+            phonetic: (targetLang === 'uk' || targetLang === 'ru') ? speechService.generatePhoneticAid(freeTranslation, targetLang) : '',
             isOffline: false,
             engine: 'Online-Übersetzung (Direkt)',
           };
@@ -113,7 +113,7 @@ export const translationManager = {
         const freeTranslation = await this.translateFreeOnline({ text, sourceLang, targetLang });
         result = {
           translation: freeTranslation,
-          phonetic: targetLang === 'uk' ? speechService.generatePhoneticAid(freeTranslation, 'uk') : '',
+          phonetic: (targetLang === 'uk' || targetLang === 'ru') ? speechService.generatePhoneticAid(freeTranslation, targetLang) : '',
           isOffline: false,
           engine: 'Online-Übersetzung',
         };

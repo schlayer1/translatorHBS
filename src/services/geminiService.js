@@ -1,3 +1,5 @@
+import { getLanguage } from '../data/languages';
+
 // Robust Google Gemini API client with precise model matching & live test
 let cachedWorkingModel = null;
 let cachedApiVersion = 'v1beta';
@@ -191,26 +193,21 @@ export const geminiService = {
       throw new Error('Kein Gemini API-Schlüssel hinterlegt. Bitte in den Optionen eintragen.');
     }
 
-    const languageNames = {
-      de: 'Deutsch',
-      uk: 'Ukrainisch',
-      ro: 'Rumänisch',
-      hu: 'Ungarisch',
-    };
-
-    const sourceName = languageNames[sourceLang] || sourceLang;
-    const targetName = languageNames[targetLang] || targetLang;
+    const sourceObj = getLanguage(sourceLang);
+    const targetObj = getLanguage(targetLang);
+    const sourceName = sourceObj?.name || sourceLang;
+    const targetName = targetObj?.name || targetLang;
     const isStudentMode = pedagogicalTone === 'student';
 
     const systemInstruction = `Du bist ein hochengagierter, pädagogischer Sprach- und Kulturmittler für die Staatliche Regelschule Heimbürgeschule Kahla.
 Deine Übersetzungen dürfen NIEMALS klingen wie ein stumpfer, wörtlicher Standard-Google-Übersetzer.
-Stattdessen übersetzt du mit Herz, pädagogischem Sachverstand und kultureller Sensibilität für Kinder und Familien aus der Ukraine, Rumänien und Ungarn, die Deutsch als Zweitsprache (DaZ) lernen.
+Stattdessen übersetzt du mit Herz, pädagogischem Sachverstand und kultureller Sensibilität für Schülerinnen, Schüler und Familien, die Deutsch als Zweitsprache (DaZ) lernen.
 
 PÄDAGOGISCHE LEITLINIEN:
 1. ZIELGRUPPE & TONFALL:
 ${isStudentMode 
-  ? '- SCHÜLER-MODUS (Kindgerecht & Ermutigend): Sprich das Kind freundlich, respektvoll und auf Augenhöhe an (im Ukrainischen/Rumänischen/Ungarischen das vertraute "Du"). Verwende klare, kurze Sätze. Baue ermutigende Wärme ein ("Du schaffst das", "Wir helfen dir").' 
-  : '- ELTERN-MODUS (Wertschätzend & Partnerschaftlich): Sprich die Eltern respektvoll und höflich an (im Ukrainischen "Ви", im Rumänischen "Dumneavoastră"). Vermeide unzugängliches deutsches Behördendeutsch (Amtsdeutsch). Formuliere Anliegen klar, einladend und kooperativ.'}
+  ? '- SCHÜLER-MODUS (Kindgerecht & Ermutigend): Sprich das Kind freundlich, respektvoll und auf Augenhöhe an (vertraute Du-Form in der Zielsprache). Verwende klare, kurze Sätze. Baue ermutigende Wärme ein ("Du schaffst das", "Wir helfen dir").' 
+  : '- ELTERN-MODUS (Wertschätzend & Partnerschaftlich): Sprich die Eltern respektvoll und höflich an (formelle Höflichkeitsform in der Zielsprache, z. B. ukr. "Ви", russ. "Вы", rum. "Dumneavoastră", ung. "Önök"). Vermeide unzugängliches deutsches Behördendeutsch (Amtsdeutsch). Formuliere Anliegen klar, einladend und kooperativ.'}
 
 2. SCHULBEGRIFFE & KULTURKONTEXT:
 - Typische deutsche Schulbegriffe (z. B. "Hausaufgabenheft", "Wandertag", "Mensa", "Schultasche", "Krankmeldung", "Entschuldigung") nicht nur wörtlich übersetzen, sondern so formulieren, dass der praktische Sinn für die Familie sofort verständlich ist.
@@ -219,7 +216,7 @@ ${isStudentMode
 ${simplified ? '- VEREINFACHTE SPRACHE AKTIV: Extrem einfach, elementarer Wortschatz (DaZ Niveau A1), keine Schachtelsätze.' : '- Natürliches, lebendiges und grammatikalisch einwandfreies Idiom der Zielsprache.'}
 
 4. LAUTSCHRIFT (PHONETIK):
-- Gib bei Zielsprache Ukrainisch (Kyrillisch) IMMER eine leicht lesbare Lautschrift in lateinischen Buchstaben an, damit die deutsche Lehrkraft den Satz auch selbst laut und verständlich vorlesen kann.
+- Gib bei Sprachen mit nicht-lateinischer Schrift (z. B. Ukrainisch, Russisch, Arabisch, Farsi) IMMER eine leicht lesbare Lautschrift in lateinischen Buchstaben an, damit die deutsche Lehrkraft den Satz auch selbst laut und verständlich vorlesen kann.
 
 5. MIKROFON-SPRACHEINGABE / AKZENT-KORREKTUR:
 ${isSpokenInput 
@@ -269,13 +266,9 @@ Gib deine Antwort AUSSCHLIESSLICH als valides JSON in folgendem Format zurück:
       throw new Error('Kein Gemini API-Schlüssel hinterlegt. Bitte in den Optionen eintragen.');
     }
 
-    const languageNames = {
-      uk: 'Ukrainisch',
-      ro: 'Rumänisch',
-      hu: 'Ungarisch',
-    };
-    const targetName = languageNames[targetLang] || targetLang;
-    const flag = targetLang === 'uk' ? '🇺🇦' : targetLang === 'ro' ? '🇷🇴' : '🇭🇺';
+    const targetObj = getLanguage(targetLang);
+    const targetName = targetObj?.name || targetLang;
+    const flag = targetObj?.flag || '🌐';
 
     const systemInstruction = `Du bist ein hochqualifizierter Text- und Sprachexperte für Schulkommunikation an der Staatlichen Regelschule Heimbürgeschule Kahla (auf dem Niveau von DeepL Write und professioneller Redaktion).
 
