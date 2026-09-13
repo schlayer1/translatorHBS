@@ -21,7 +21,8 @@ import {
   BookOpen,
   ArrowRight,
   MessageSquare,
-  Lightbulb
+  Lightbulb,
+  Languages
 } from 'lucide-react';
 import { SUPPORTED_LANGUAGES, FREQUENT_PAIRS, getLanguage } from '../data/languages';
 import { translationManager } from '../services/translationManager';
@@ -39,7 +40,7 @@ const CONTEXT_TEMPLATES = [
 export default function TranslatorView({ onOpenDialogue, isForcedOffline = false, initialPreset = null, onClearPreset }) {
   const [sourceLang, setSourceLang] = useState('de');
   const [targetLang, setTargetLang] = useState('uk');
-  const [sourceText, setSourceText] = useState('Bitte denkt daran, morgen euer Zeichenheft und Buntstifte mitzubringen.');
+  const [sourceText, setSourceText] = useState('');
   const [translatedText, setTranslatedText] = useState('');
   const [phoneticText, setPhoneticText] = useState('');
   const [simplified, setSimplified] = useState(false);
@@ -56,7 +57,6 @@ export default function TranslatorView({ onOpenDialogue, isForcedOffline = false
   const [speechSpeed, setSpeechSpeed] = useState(1.0);
 
   const recognizerRef = useRef(null);
-  const translationTimeoutRef = useRef(null);
 
   // Handle incoming preset from Redemittel
   useEffect(() => {
@@ -128,17 +128,9 @@ export default function TranslatorView({ onOpenDialogue, isForcedOffline = false
     }
   };
 
-  // Initial and reactive translation on change
-  useEffect(() => {
-    if (translationTimeoutRef.current) {
-      clearTimeout(translationTimeoutRef.current);
-    }
-    translationTimeoutRef.current = setTimeout(() => {
-      triggerTranslation(sourceText, sourceLang, targetLang, simplified, pedagogicalTone, isSpokenInput);
-    }, 350);
-
-    return () => clearTimeout(translationTimeoutRef.current);
-  }, [sourceText, sourceLang, targetLang, simplified, pedagogicalTone, isSpokenInput, isForcedOffline]);
+  const handleTranslateClick = () => {
+    triggerTranslation(sourceText, sourceLang, targetLang, simplified, pedagogicalTone, isSpokenInput);
+  };
 
   // Language Swap
   const handleSwapLanguages = () => {
@@ -371,6 +363,12 @@ export default function TranslatorView({ onOpenDialogue, isForcedOffline = false
             setSourceText(e.target.value);
           }}
           placeholder={currentSourceObj.placeholder}
+          onKeyDown={(e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+              e.preventDefault();
+              handleTranslateClick();
+            }
+          }}
           className="w-full bg-transparent resize-none text-slate-900 text-base focus:outline-none placeholder:text-slate-400 font-medium leading-relaxed"
         />
 
@@ -429,22 +427,45 @@ export default function TranslatorView({ onOpenDialogue, isForcedOffline = false
             </button>
           </div>
 
-          {/* Voice Input (Microphone) */}
-          <div className="relative flex items-center justify-center">
-            {isRecording && (
-              <span className="absolute w-12 h-12 rounded-xl bg-red-500/30 animate-ping pointer-events-none"></span>
-            )}
+          {/* Action Buttons: Voice Input & Translate Trigger */}
+          <div className="flex items-center gap-2">
+            {/* Voice Input (Microphone) */}
+            <div className="relative flex items-center justify-center">
+              {isRecording && (
+                <span className="absolute w-12 h-12 rounded-xl bg-red-500/30 animate-ping pointer-events-none"></span>
+              )}
+              <button
+                onClick={toggleSpeechRecognition}
+                aria-label="Sprachaufnahme"
+                className={`w-9 h-9 rounded-xl flex items-center justify-center text-white shadow-sm transition-all z-10 active:scale-[0.92] ${
+                  isRecording
+                    ? 'bg-red-600 ring-2 ring-red-300 animate-pulse'
+                    : 'bg-school-orange hover:bg-school-orangeDark shadow-xs'
+                }`}
+                title={isRecording ? 'Aufnahme stoppen' : 'Aufnahme starten'}
+              >
+                {isRecording ? <Square className="w-3.5 h-3.5 fill-white" /> : <Mic className="w-4 h-4" />}
+              </button>
+            </div>
+
+            {/* Manual Translate Trigger Button */}
             <button
-              onClick={toggleSpeechRecognition}
-              aria-label="Sprachaufnahme"
-              className={`w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-sm transition-all z-10 active:scale-[0.92] ${
-                isRecording
-                  ? 'bg-red-600 ring-2 ring-red-300 animate-pulse'
-                  : 'bg-school-orange hover:bg-school-orangeDark shadow-xs'
-              }`}
-              title={isRecording ? 'Aufnahme stoppen' : 'Aufnahme starten'}
+              onClick={handleTranslateClick}
+              disabled={isTranslating || !sourceText.trim()}
+              className="h-9 px-3.5 rounded-xl bg-school-blue hover:bg-school-blueDark text-white font-bold text-xs shadow-xs active:scale-[0.96] transition-all flex items-center gap-1.5 disabled:opacity-40"
+              title="Übersetzung starten (Enter)"
             >
-              {isRecording ? <Square className="w-4 h-4 fill-white" /> : <Mic className="w-5 h-5" />}
+              {isTranslating ? (
+                <>
+                  <span className="w-3 h-3 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
+                  <span>Übersetze...</span>
+                </>
+              ) : (
+                <>
+                  <Languages className="w-3.5 h-3.5" />
+                  <span>Übersetzen</span>
+                </>
+              )}
             </button>
           </div>
         </div>
