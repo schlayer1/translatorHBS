@@ -19,7 +19,7 @@ import {
   BookOpen
 } from 'lucide-react';
 import { PARENT_LETTER_TEMPLATES } from '../data/parentLetterTemplates';
-import { SUPPORTED_LANGUAGES, getLanguage } from '../data/languages';
+import { SUPPORTED_LANGUAGES, getLanguage, useSupportedLanguages } from '../data/languages';
 import { geminiService } from '../services/geminiService';
 import { storageService } from '../services/storageService';
 import { speechService } from '../services/speechService';
@@ -33,6 +33,7 @@ const TEMPLATE_ICONS = {
 };
 
 export default function ParentLetterView({ isForcedOffline = false }) {
+  const supportedLanguages = useSupportedLanguages();
   const [targetLang, setTargetLang] = useState('uk');
   const [draftText, setDraftText] = useState(
     'Liebe Eltern, am kommenden Donnerstag planen wir einen gemeinsamen Wandertag. Bitte geben Sie Ihrem Kind wetterfeste Kleidung und 3 Euro für den Bus mit.'
@@ -96,7 +97,7 @@ export default function ParentLetterView({ isForcedOffline = false }) {
   const handleSelectTemplate = (template) => {
     setDraftText(template.de);
     setPolishedGerman(template.de);
-    const translated = template[targetLang] || '';
+    const translated = template[targetLang] || storageService.getInstalledPhrases(targetLang)[template.id] || '';
     setTranslatedLetter(translated);
 
     const flag = targetLangObj.flag;
@@ -200,7 +201,7 @@ export default function ParentLetterView({ isForcedOffline = false }) {
             }}
             className="w-full h-10 pl-3 pr-8 rounded-xl bg-white border border-slate-200/80 text-slate-800 text-xs font-bold shadow-2xs appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-school-blue/20"
           >
-            {SUPPORTED_LANGUAGES.filter(l => l.code !== 'de').map(l => (
+            {supportedLanguages.filter(l => l.code !== 'de').map(l => (
               <option key={l.code} value={l.code}>
                 {l.flag} An Eltern: {l.name}
               </option>

@@ -24,7 +24,7 @@ import {
   Lightbulb,
   Languages
 } from 'lucide-react';
-import { SUPPORTED_LANGUAGES, FREQUENT_PAIRS, getLanguage } from '../data/languages';
+import { SUPPORTED_LANGUAGES, FREQUENT_PAIRS, getLanguage, useSupportedLanguages } from '../data/languages';
 import { translationManager } from '../services/translationManager';
 import { speechService } from '../services/speechService';
 import { storageService } from '../services/storageService';
@@ -38,6 +38,7 @@ const CONTEXT_TEMPLATES = [
 ];
 
 export default function TranslatorView({ onOpenDialogue, isForcedOffline = false, initialPreset = null, onClearPreset }) {
+  const supportedLanguages = useSupportedLanguages();
   const [sourceLang, setSourceLang] = useState('de');
   const [targetLang, setTargetLang] = useState('uk');
   const [sourceText, setSourceText] = useState('');
@@ -266,7 +267,7 @@ export default function TranslatorView({ onOpenDialogue, isForcedOffline = false
             onChange={(e) => setSourceLang(e.target.value)}
             className="w-full h-10 pl-3 pr-8 rounded-xl bg-slate-50/80 border border-slate-200/70 hover:border-slate-300 text-slate-800 text-sm font-bold appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-school-blue/20 transition-all"
           >
-            {SUPPORTED_LANGUAGES.map((l) => (
+            {supportedLanguages.map((l) => (
               <option key={l.code} value={l.code}>
                 {l.flag} {l.name}
               </option>
@@ -291,7 +292,7 @@ export default function TranslatorView({ onOpenDialogue, isForcedOffline = false
             onChange={(e) => setTargetLang(e.target.value)}
             className="w-full h-10 pl-3 pr-8 rounded-xl bg-slate-50/80 border border-slate-200/70 hover:border-slate-300 text-slate-800 text-sm font-bold appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-school-teal/20 transition-all"
           >
-            {SUPPORTED_LANGUAGES.map((l) => (
+            {supportedLanguages.map((l) => (
               <option key={l.code} value={l.code}>
                 {l.flag} {l.name}
               </option>

@@ -19,6 +19,8 @@ export const SCHOOL_PHRASES = [
     uk_phonetic: 'Bud laska, widkrij pidrutschnik na storinzi ...',
     ro: 'Te rog să deschizi cartea la pagina ...',
     hu: 'Kérlek, nyisd ki a könyved a ... oldalon.',
+    ru: 'Пожалуйста, открой учебник на странице ...',
+    ru_phonetic: 'Poschalujsta, otkroj utschebnik na stranize ...',
   },
   {
     id: 'u2',
@@ -28,6 +30,8 @@ export const SCHOOL_PHRASES = [
     uk_phonetic: 'Pratsjujte, bud laska, tycho w parach.',
     ro: 'Vă rog să lucrați în liniște în perechi.',
     hu: 'Kérlek, dolgozzatok csendben a párotokkal.',
+    ru: 'Пожалуйста, работайте тихо в парах.',
+    ru_phonetic: 'Poschalujsta, rabotajte ticho w parach.',
   },
   {
     id: 'u3',
@@ -37,6 +41,8 @@ export const SCHOOL_PHRASES = [
     uk_phonetic: 'Bud laska, pidnimi ruku, jakschtscho majesch sapytannja.',
     ro: 'Te rog să ridici mâna dacă ai o întrebare sau vrei să răspunzi.',
     hu: 'Kérlek, jelentkezz, ha kérdésed van vagy szólni szeretnél.',
+    ru: 'Пожалуйста, подними руку, если у тебя есть вопрос или ты хочешь ответить.',
+    ru_phonetic: 'Poschalujsta, podnimi ruku, jesli u tebja jest wopros...',
   },
   {
     id: 'u4',
@@ -46,6 +52,8 @@ export const SCHOOL_PHRASES = [
     uk_phonetic: 'Perepyschy tekst akuratno u swij soschyt.',
     ro: 'Copiază textul frumos în caietul tău.',
     hu: 'Másold le a szöveget szépen a füzetedbe.',
+    ru: 'Спиши текст аккуратно в тетрадь.',
+    ru_phonetic: 'Spischi tekst akkuratno w tetrad.',
   },
   {
     id: 'u5',
@@ -55,6 +63,8 @@ export const SCHOOL_PHRASES = [
     uk_phonetic: 'Sluchaj, bud laska, uwaschno.',
     ro: 'Te rog să asculți cu atenție.',
     hu: 'Kérlek, figyelmesen hallgass ide.',
+    ru: 'Слушай, пожалуйста, внимательно.',
+    ru_phonetic: 'Sluschaj, poschalujsta, wnimatelno.',
   },
   {
     id: 'u6',
@@ -64,6 +74,8 @@ export const SCHOOL_PHRASES = [
     uk_phonetic: 'Ty wsje sakintschyw / sakintschyla swoje sawdannja?',
     ro: 'Ai terminat exercițiul tău?',
     hu: 'Készen vagy a feladatoddal?',
+    ru: 'Ты уже закончил / закончила задание?',
+    ru_phonetic: 'Ty usche sakontschil / sakontschila sadanije?',
   },
   {
     id: 'u7',
@@ -73,6 +85,8 @@ export const SCHOOL_PHRASES = [
     uk_phonetic: 'Dusche dobre! Ty tschudowo tse srosumiw.',
     ro: 'Foarte bine lucrat! Ai înțeles excelent.',
     hu: 'Nagyon szép munka! Remekül megértetted.',
+    ru: 'Очень хорошо! Ты отлично всё понял / поняла.',
+    ru_phonetic: 'Otschen choroscho! Ty otlitschno wsjo ponjal / ponjala.',
   },
   {
     id: 'u8',
@@ -82,6 +96,8 @@ export const SCHOOL_PHRASES = [
     uk_phonetic: 'Ne chwyljujsja, my potrenujemojsja rasom schtsche ras.',
     ro: 'Nu-ți face griji, vom exersa din nou împreună.',
     hu: 'Ne aggódj, gyakoroljuk még egyszer együtt.',
+    ru: 'Не волнуйся, мы потренируемся вместе ещё раз.',
+    ru_phonetic: 'Ne wolnujsja, my potrenujemsja wmeste jeschtscho ras.',
   },
 
   // --- HAUSAUFGABEN & MATERIALIEN ---
@@ -93,6 +109,8 @@ export const SCHOOL_PHRASES = [
     uk_phonetic: 'Domaschnje sawdannja na sawtra: storinka ... nomer ...',
     ro: 'Tema pentru acasă pentru mâine este la pagina ... exercițiul ...',
     hu: 'A holnapi házi feladat a ... oldalon a ... feladat.',
+    ru: 'Домашнее задание на завтра: страница ... номер ...',
+    ru_phonetic: 'Domaschneje sadanije na sawtra: straniza ... nomer ...',
   },
   {
     id: 'h2',
@@ -102,6 +120,8 @@ export const SCHOOL_PHRASES = [
     uk_phonetic: 'Sapyschy domaschnje sawdannja saras u swij schtschodennik.',
     ro: 'Notează tema pentru acasă acum în carnetul tău.',
     hu: 'Írd be a házi feladatot most az üzenőfüzetedbe.',
+    ru: 'Запиши домашнее задание сейчас в дневник.',
+    ru_phonetic: 'Sapischi domaschneje sadanije sejtschas w dnewnik.',
   },
   {
     id: 'h3',
@@ -111,6 +131,8 @@ export const SCHOOL_PHRASES = [
     uk_phonetic: 'Prynesy sawtra, bud laska, linijku, kolirowi oliwzi ta klej.',
     ro: 'Te rog să aduci mâine o riglă, creioane colorate și lipici.',
     hu: 'Kérlek, hozz holnap vonalzót, színes ceruzákat és ragasztót.',
+    ru: 'Принеси завтра, пожалуйста, линейку, цветные карандаши и клей.',
+    ru_phonetic: 'Prinesi sawtra, poschalujsta, linejku, zwetnyje karandaschi i klej.',
   },
   {
     id: 'h4',
@@ -120,6 +142,8 @@ export const SCHOOL_PHRASES = [
     uk_phonetic: 'Ty majesch is soboju domaschnje sawdannja?',
     ro: 'Ai adus tema pentru acasă cu tine?',
     hu: 'Nálad van a házi feladatod?',
+    ru: 'У тебя с собой домашнее задание?',
+    ru_phonetic: 'U tebja s soboj domaschneje sadanije?',
   },
   {
     id: 'h5',
@@ -129,6 +153,8 @@ export const SCHOOL_PHRASES = [
     uk_phonetic: 'Sklady, bud laska, wsi retschi akuratno w portfel.',
     ro: 'Pune toate materialele ordonat în ghiozdan.',
     hu: 'Kérlek, pakolj be minden tanszert rendesen az iskolatáskádba.',
+    ru: 'Сложи, пожалуйста, все материалы аккуратно в портфель.',
+    ru_phonetic: 'Sloschi, poschalujsta, wse materialy akkuratno w portfel.',
   },
 
   // --- RAUM & ORGANISATION ---
@@ -140,6 +166,8 @@ export const SCHOOL_PHRASES = [
     uk_phonetic: 'Saras my perechodymo w inschyj kabinet. Jdemo do kimnaty ...',
     ro: 'Schimbăm sala acum. Mergem în sala ...',
     hu: 'Most termet cserélünk. A ... terembe megyünk.',
+    ru: 'Сейчас мы переходим в другой кабинет. Идём в кабинет ...',
+    ru_phonetic: 'Sejtschas my perechodim w drugoj kabinet. Idjom w kabinet ...',
   },
   {
     id: 'o2',
@@ -149,6 +177,8 @@ export const SCHOOL_PHRASES = [
     uk_phonetic: 'Saras welyka pererwa. Wsi wychodjat na schkilne podwirja.',
     ro: 'Acum este pauza mare. Toată lumea merge în curtea școlii.',
     hu: 'Most nagyszünet van. Kérlek, mindenki menjen ki az iskolaudvarra.',
+    ru: 'Сейчас большая перемена. Все выходят во двор школы.',
+    ru_phonetic: 'Sejtschas bolschaja peremena. Wse wychodjat wo dwor schkoly.',
   },
   {
     id: 'o3',
@@ -158,6 +188,8 @@ export const SCHOOL_PHRASES = [
     uk_phonetic: 'Uroky na sjohodni sakintschylysja. Harnogo widpotschynku!',
     ro: 'Orele s-au terminat pentru azi. O zi bună în continuare!',
     hu: 'Mára véget értek az órák. Szép napot és jó pihenést!',
+    ru: 'Уроки на сегодня закончились. Хорошего отдыха!',
+    ru_phonetic: 'Uroki na segodnja sakontschilis. Choroschego otdycha!',
   },
   {
     id: 'o4',
@@ -167,6 +199,8 @@ export const SCHOOL_PHRASES = [
     uk_phonetic: 'Telefony pid tschas uroku powynni buty wymkneni w portfeli.',
     ro: 'Telefoanele mobile rămân oprite în ghiozdan în timpul orelor.',
     hu: 'A mobiltelefonoknak az órák alatt kikapcsolva, a táskában kell maradniuk.',
+    ru: 'Телефоны во время урока должны быть выключены и находиться в портфеле.',
+    ru_phonetic: 'Telefony wo wremja uroka dolschny byt wykljutscheny i nachoditsja w portfele.',
   },
   {
     id: 'o5',
@@ -176,6 +210,8 @@ export const SCHOOL_PHRASES = [
     uk_phonetic: 'Bud laska, perewszujsja u sminne wsuttja.',
     ro: 'Te rog să te încalți cu pantofii de schimb.',
     hu: 'Kérlek, vedd fel a váltócipődet.',
+    ru: 'Пожалуйста, переобуйся в сменную обувь.',
+    ru_phonetic: 'Poschalujsta, pereobujsja w smennuju obuw.',
   },
 
   // --- MENSA & ESSEN ---
@@ -187,6 +223,8 @@ export const SCHOOL_PHRASES = [
     uk_phonetic: 'Smatschnoho sa obidom!',
     ro: 'Poftă bună la prânz!',
     hu: 'Jó étvágyat az ebédhez!',
+    ru: 'Приятного аппетита за обедом!',
+    ru_phonetic: 'Prijatnogo appetita sa obedom!',
   },
   {
     id: 'm2',
@@ -196,6 +234,8 @@ export const SCHOOL_PHRASES = [
     uk_phonetic: 'Bud laska, spokijno stan u tscherhu.',
     ro: 'Te rog să stai liniștit la rând.',
     hu: 'Kérlek, állj be szépen a sorba.',
+    ru: 'Пожалуйста, спокойно встань в очередь.',
+    ru_phonetic: 'Poschalujsta, spokojno wstan w otscherjed.',
   },
   {
     id: 'm3',
@@ -205,6 +245,8 @@ export const SCHOOL_PHRASES = [
     uk_phonetic: 'Widnesy, bud laska, swoju tazju ta posud do wiska.',
     ro: 'Te rog să duci tava și vesela la căruciorul pentru vase.',
     hu: 'Kérlek, vidd a tálcádat és az edényeket a gyűjtőkocsihoz.',
+    ru: 'Отнеси, пожалуйста, поднос и посуду к тележке для посуды.',
+    ru_phonetic: 'Otnesi, poschalujsta, podnos i posudu k teleschke dlja posudy.',
   },
 
   // --- KRANKENSTATION & WOHLBEFINDEN ---
@@ -216,6 +258,8 @@ export const SCHOOL_PHRASES = [
     uk_phonetic: 'Tobi pohano? De same bolyt?',
     ro: 'Nu te simți bine? Unde te doare?',
     hu: 'Nem érzed jól magad? Hol fáj?',
+    ru: 'Тебе нехорошо? Где болит?',
+    ru_phonetic: 'Tebe nechoroscho? Gde bolit?',
   },
   {
     id: 'g2',
@@ -225,6 +269,8 @@ export const SCHOOL_PHRASES = [
     uk_phonetic: 'Chotschesch trochy poleschaty w medytschnomu kabineti?',
     ro: 'Vrei să te întinzi puțin în cabinetul medical?',
     hu: 'Szeretnél lefeküdni egy kicsit az orvosi szobában?',
+    ru: 'Хочешь немного полежать в медицинском кабинете?',
+    ru_phonetic: 'Chotschesch nemnogo poleschat w medizinskom kabinete?',
   },
   {
     id: 'g3',
@@ -234,6 +280,8 @@ export const SCHOOL_PHRASES = [
     uk_phonetic: 'My satelefonujemo twojim batkam, schtschob tebe sabraly.',
     ro: 'Îi vom suna pe părinții tăi să vină să te ia acasă.',
     hu: 'Felhívjuk a szüleidet, hogy jöjjenek el érted.',
+    ru: 'Мы позвоним родителям, чтобы тебя забрали домой.',
+    ru_phonetic: 'My poswonim roditeljam, schtoby tebja sabrali domoj.',
   },
   {
     id: 'g4',
@@ -243,6 +291,8 @@ export const SCHOOL_PHRASES = [
     uk_phonetic: 'Sroby spotschatku kilka kowtkiw procholodnoji wody.',
     ro: 'Bea te rog mai întâi o înghițitură de apă.',
     hu: 'Kérlek, igyál először egy korty vizet.',
+    ru: 'Выпей сначала глоток прохладной воды.',
+    ru_phonetic: 'Wypej snatschala glotok prochladnoj wody.',
   },
 
   // --- ELTERNKONTAKT & NOTIZEN ---
@@ -254,6 +304,8 @@ export const SCHOOL_PHRASES = [
     uk_phonetic: 'Bud laska, peredaj tsej lyst batkam. Wony majut joho pidpysaty.',
     ro: 'Vă rugăm să dați acest bilet părinților. Trebuie semnat de ei.',
     hu: 'Kérlek, add át ezt a lapot a szüleidnek. Alá kell írniuk.',
+    ru: 'Пожалуйста, передай этот лист родителям. Они должны его подписать.',
+    ru_phonetic: 'Poschalujsta, peredaj etot list roditeljam. Oni dolschny jego podpisat.',
   },
   {
     id: 'e2',
@@ -263,6 +315,8 @@ export const SCHOOL_PHRASES = [
     uk_phonetic: 'My chotily b saprosyty was na osobystu rosmowu.',
     ro: 'Dorim să stabilim o scurtă discuție cu privire la progresele copilului.',
     hu: 'Szeretnénk egy személyes megbeszélést tartani gyermeke fejlődéséről.',
+    ru: 'Мы хотели бы пригласить вас на личную беседу об успехах вашего ребёнка.',
+    ru_phonetic: 'My choteli by priglasit was na litschnuju besedu ob uspechach waschego rebjonka.',
   },
   {
     id: 'e3',
@@ -272,6 +326,8 @@ export const SCHOOL_PHRASES = [
     uk_phonetic: 'U rasi propusku sanjat, nadajte pysmowe pojasnennja.',
     ro: 'Vă rugăm să aduceți o scutire scrisă pentru zilele în care copilul a lipsit.',
     hu: 'Kérjük, a hiányzásokról az első naptól kezdve hozzanak igazolást.',
+    ru: 'При пропуске занятий, пожалуйста, предоставьте записку от родителей с первого же дня.',
+    ru_phonetic: 'Pri propuske sanjatij, poschalujsta, predostawte sapysku ot roditelej s perwogo sche dnja.',
   },
   {
     id: 'e4',
@@ -281,5 +337,7 @@ export const SCHOOL_PHRASES = [
     uk_phonetic: 'Wascha dytyna sjohodni prazjuwala dusche staranno. Welyka pochwala!',
     ro: 'Copilul dumneavoastră a fost foarte harnic și cooperant astăzi. Felicitări!',
     hu: 'Gyermeke ma különösen szorgalmas és ügyes volt. Nagy dicséret illeti!',
+    ru: 'Ваш ребёнок сегодня работал очень старательно и дружелюбно. Большой молодец!',
+    ru_phonetic: 'Wasch rebjonok segodnja rabotal otschen staratelno i drusheljubno. Bolschoj molodez!',
   },
 ];

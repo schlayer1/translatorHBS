@@ -1,9 +1,10 @@
 import React, { useState, useRef } from 'react';
-import { SUPPORTED_LANGUAGES, getLanguage } from '../data/languages';
+import { SUPPORTED_LANGUAGES, getLanguage, useSupportedLanguages } from '../data/languages';
 import { translationManager } from '../services/translationManager';
 import { speechService } from '../services/speechService';
 
 export default function DualDialogueView({ isForcedOffline = false }) {
+  const supportedLanguages = useSupportedLanguages();
   const [partnerLang, setPartnerLang] = useState('uk');
   const [isFlipped, setIsFlipped] = useState(true); // Table face-to-face mode
   const [messages, setMessages] = useState([
@@ -159,7 +160,7 @@ export default function DualDialogueView({ isForcedOffline = false }) {
             onChange={(e) => setPartnerLang(e.target.value)}
             className="px-2 py-1 bg-white border border-school-teal/30 rounded-lg text-school-tealDark font-bold text-xs"
           >
-            {SUPPORTED_LANGUAGES.filter(l => l.code !== 'de').map(l => (
+            {supportedLanguages.filter(l => l.code !== 'de').map(l => (
               <option key={l.code} value={l.code}>
                 {l.flag} {l.name}
               </option>

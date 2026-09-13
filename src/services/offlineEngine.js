@@ -1,33 +1,34 @@
 import { SCHOOL_PHRASES } from '../data/schoolPhrases';
 import { speechService } from './speechService';
+import { storageService } from './storageService';
 
 // Frequently used school keywords and expressions for instantaneous offline translation
 const SCHOOL_DICTIONARY = [
-  { de: 'hallo', uk: 'привіт', ro: 'bună', hu: 'szia' },
-  { de: 'guten morgen', uk: 'доброго ранку', ro: 'bună dimineața', hu: 'jó reggelt' },
-  { de: 'guten tag', uk: 'добрий день', ro: 'bună ziua', hu: 'jó napot' },
-  { de: 'auf wiedersehen', uk: 'до побачення', ro: 'la revedere', hu: 'viszontlátásra' },
-  { de: 'tschüss', uk: 'бувай', ro: 'pa', hu: 'szia' },
-  { de: 'danke', uk: 'дякую', ro: 'mulțumesc', hu: 'köszönöm' },
-  { de: 'bitte', uk: 'будь ласка', ro: 'vă rog / cu plăcere', hu: 'kérem / szívesen' },
-  { de: 'ja', uk: 'так', ro: 'da', hu: 'igen' },
-  { de: 'nein', uk: 'ні', ro: 'nu', hu: 'nem' },
-  { de: 'entschuldigung', uk: 'вибачте', ro: 'scuze', hu: 'elnézést' },
-  { de: 'ich verstehe', uk: 'я розумію', ro: 'înțeleg', hu: 'értem' },
-  { de: 'ich verstehe nicht', uk: 'я не розумію', ro: 'nu înțeleg', hu: 'nem értem' },
-  { de: 'hilfe', uk: 'допомога', ro: 'ajutor', hu: 'segítség' },
-  { de: 'darf ich auf die toilette', uk: 'можна вийти в туалет?', ro: 'pot merge la toaletă?', hu: 'kimehetek a mosdóba?' },
-  { de: 'darf ich trinken', uk: 'можна попити води?', ro: 'pot să beau apă?', hu: 'ihatok vizet?' },
-  { de: 'buch', uk: 'книга', ro: 'carte', hu: 'könyv' },
-  { de: 'heft', uk: 'зошит', ro: 'caiet', hu: 'füzet' },
-  { de: 'stift', uk: 'ручка / олівець', ro: 'pix / creion', hu: 'toll / ceruza' },
-  { de: 'lineal', uk: 'лінійка', ro: 'riglă', hu: 'vonalzó' },
-  { de: 'hausaufgabe', uk: 'домашнє завдання', ro: 'temă pentru acasă', hu: 'házi feladat' },
-  { de: 'tafel', uk: 'дошка', ro: 'tablă', hu: 'tábla' },
-  { de: 'pause', uk: 'перерва', ro: 'pauză', hu: 'szünet' },
-  { de: 'leise sein', uk: 'бути тихо', ro: 'liniște', hu: 'csendet' },
-  { de: 'gut gemacht', uk: 'молодець / дуже добре', ro: 'bravo / foarte bine', hu: 'nagyon jó / ügyes vagy' },
-  { de: 'weiter so', uk: 'так тримати', ro: 'continuă tot așa', hu: 'csak így tovább' },
+  { de: 'hallo', uk: 'привіт', ro: 'bună', hu: 'szia', ru: 'привет' },
+  { de: 'guten morgen', uk: 'доброго ранку', ro: 'bună dimineața', hu: 'jó reggelt', ru: 'доброе утро' },
+  { de: 'guten tag', uk: 'добрий день', ro: 'bună ziua', hu: 'jó napot', ru: 'добрый день' },
+  { de: 'auf wiedersehen', uk: 'до побачення', ro: 'la revedere', hu: 'viszontlátásra', ru: 'до свидания' },
+  { de: 'tschüss', uk: 'бувай', ro: 'pa', hu: 'szia', ru: 'пока' },
+  { de: 'danke', uk: 'дякую', ro: 'mulțumesc', hu: 'köszönöm', ru: 'спасибо' },
+  { de: 'bitte', uk: 'будь ласка', ro: 'vă rog / cu plăcere', hu: 'kérem / szívesen', ru: 'пожалуйста' },
+  { de: 'ja', uk: 'так', ro: 'da', hu: 'igen', ru: 'да' },
+  { de: 'nein', uk: 'ні', ro: 'nu', hu: 'nem', ru: 'нет' },
+  { de: 'entschuldigung', uk: 'вибачте', ro: 'scuze', hu: 'elnézést', ru: 'извините' },
+  { de: 'ich verstehe', uk: 'я розумію', ro: 'înțeleg', hu: 'értem', ru: 'я понимаю' },
+  { de: 'ich verstehe nicht', uk: 'я не розумію', ro: 'nu înțeleg', hu: 'nem értem', ru: 'я не понимаю' },
+  { de: 'hilfe', uk: 'допомога', ro: 'ajutor', hu: 'segítség', ru: 'помощь' },
+  { de: 'darf ich auf die toilette', uk: 'можна вийти в туалет?', ro: 'pot merge la toaletă?', hu: 'kimehetek a mosdóba?', ru: 'можно выйти в туалет?' },
+  { de: 'darf ich trinken', uk: 'можна попити води?', ro: 'pot să beau apă?', hu: 'ihatok vizet?', ru: 'можно попить воды?' },
+  { de: 'buch', uk: 'книга', ro: 'carte', hu: 'könyv', ru: 'книга' },
+  { de: 'heft', uk: 'зошит', ro: 'caiet', hu: 'füzet', ru: 'тетрадь' },
+  { de: 'stift', uk: 'ручка / олівець', ro: 'pix / creion', hu: 'toll / ceruza', ru: 'ручка / карандаш' },
+  { de: 'lineal', uk: 'лінійка', ro: 'riglă', hu: 'vonalzó', ru: 'линейка' },
+  { de: 'hausaufgabe', uk: 'домашнє завдання', ro: 'temă pentru acasă', hu: 'házi feladat', ru: 'домашнее задание' },
+  { de: 'tafel', uk: 'дошка', ro: 'tablă', hu: 'tábla', ru: 'доска' },
+  { de: 'pause', uk: 'перерва', ro: 'pauză', hu: 'szünet', ru: 'перемена' },
+  { de: 'leise sein', uk: 'бути тихо', ro: 'liniște', hu: 'csendet', ru: 'тишина' },
+  { de: 'gut gemacht', uk: 'молодець / дуже добре', ro: 'bravo / foarte bine', hu: 'nagyon jó / ügyes vagy', ru: 'молодец / отлично' },
+  { de: 'weiter so', uk: 'так тримати', ro: 'continuă tot așa', hu: 'csak így tovább', ru: 'так держать' },
 ];
 
 function normalize(str) {
@@ -46,11 +47,12 @@ export const offlineEngine = {
     }
 
     const cleanInput = normalize(text);
+    const installedPhrases = storageService.getInstalledPhrases(targetLang);
 
-    // 1. Check exact or fuzzy match in curated SCHOOL_PHRASES
+    // 1. Check exact or fuzzy match in curated SCHOOL_PHRASES (or dynamically installed phrases)
     for (const phrase of SCHOOL_PHRASES) {
       const sourceVal = phrase[sourceLang];
-      const targetVal = phrase[targetLang];
+      const targetVal = phrase[targetLang] || (sourceLang === 'de' ? installedPhrases[phrase.id] : null);
 
       if (sourceVal && targetVal) {
         const cleanSource = normalize(sourceVal);
@@ -59,7 +61,9 @@ export const offlineEngine = {
         if (cleanSource === cleanInput) {
           return {
             translation: targetVal,
-            phonetic: targetLang === 'uk' ? (phrase.uk_phonetic || speechService.generatePhoneticAid(targetVal, 'uk')) : '',
+            phonetic: (targetLang === 'uk' || targetLang === 'ru') 
+              ? (phrase[`${targetLang}_phonetic`] || speechService.generatePhoneticAid(targetVal, targetLang)) 
+              : '',
             source: 'school_lexicon_exact',
             matchQuality: '100%',
           };
@@ -69,7 +73,9 @@ export const offlineEngine = {
         if (cleanSource.length > 8 && (cleanInput.includes(cleanSource) || cleanSource.includes(cleanInput))) {
           return {
             translation: targetVal,
-            phonetic: targetLang === 'uk' ? (phrase.uk_phonetic || speechService.generatePhoneticAid(targetVal, 'uk')) : '',
+            phonetic: (targetLang === 'uk' || targetLang === 'ru') 
+              ? (phrase[`${targetLang}_phonetic`] || speechService.generatePhoneticAid(targetVal, targetLang)) 
+              : '',
             source: 'school_lexicon_fuzzy',
             matchQuality: '85%',
           };
@@ -84,7 +90,9 @@ export const offlineEngine = {
       if (src && tgt && normalize(src) === cleanInput) {
         return {
           translation: tgt,
-          phonetic: targetLang === 'uk' ? speechService.generatePhoneticAid(tgt, 'uk') : '',
+          phonetic: (targetLang === 'uk' || targetLang === 'ru') 
+            ? speechService.generatePhoneticAid(tgt, targetLang) 
+            : '',
           source: 'dictionary_exact',
           matchQuality: '95%',
         };
@@ -115,7 +123,9 @@ export const offlineEngine = {
       const resultText = translatedWords.join(' ');
       return {
         translation: resultText,
-        phonetic: targetLang === 'uk' ? speechService.generatePhoneticAid(resultText, 'uk') : '',
+        phonetic: (targetLang === 'uk' || targetLang === 'ru') 
+          ? speechService.generatePhoneticAid(resultText, targetLang) 
+          : '',
         source: 'dictionary_composite',
         matchQuality: '70%',
       };
@@ -124,7 +134,9 @@ export const offlineEngine = {
     // 4. If phrase isn't known yet offline: return text without [Offline-Modus] prefix
     return {
       translation: text,
-      phonetic: targetLang === 'uk' ? speechService.generatePhoneticAid(text, 'uk') : '',
+      phonetic: (targetLang === 'uk' || targetLang === 'ru') 
+        ? speechService.generatePhoneticAid(text, targetLang) 
+        : '',
       source: 'offline_fallback',
       matchQuality: 'basic',
     };

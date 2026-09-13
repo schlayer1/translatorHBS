@@ -5,6 +5,8 @@ const STORAGE_KEYS = {
   OFFLINE_PACKS: 'heimbuerge_translator_offline_packs_v1',
   CUSTOM_PHRASES: 'heimbuerge_translator_custom_phrases_v1',
   ONBOARDING_SEEN: 'heimbuerge_translator_onboarding_seen_v1',
+  INSTALLED_LANGUAGES: 'heimbuerge_translator_installed_languages_v1',
+  INSTALLED_PHRASES: 'heimbuerge_translator_installed_phrases_v1',
 };
 
 const DEFAULT_SETTINGS = {
@@ -181,6 +183,96 @@ export const storageService = {
       localStorage.setItem(STORAGE_KEYS.ONBOARDING_SEEN, seen ? 'true' : 'false');
     } catch (e) {
       console.error('Error saving onboarding status', e);
+    }
+  },
+
+  getInstalledLanguages() {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.INSTALLED_LANGUAGES);
+      return data ? JSON.parse(data) : [];
+    } catch (e) {
+      console.error('Error reading installed languages', e);
+      return [];
+    }
+  },
+
+  saveInstalledLanguage(language) {
+    try {
+      const current = this.getInstalledLanguages();
+      const exists = current.some(l => l.code === language.code);
+      let updated;
+      if (exists) {
+        updated = current.map(l => l.code === language.code ? { ...l, ...language } : l);
+      } else {
+        updated = [...current, { ...language, installedAt: new Date().toISOString() }];
+      }
+      localStorage.setItem(STORAGE_KEYS.INSTALLED_LANGUAGES, JSON.stringify(updated));
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('heimbuerge_languages_changed'));
+      }
+      return updated;
+    } catch (e) {
+      console.error('Error saving installed language', e);
+      return [];
+    }
+  },
+
+  removeInstalledLanguage(langCode) {
+    try {
+      const current = this.getInstalledLanguages();
+      const updated = current.filter(l => l.code !== langCode);
+      localStorage.setItem(STORAGE_KEYS.INSTALLED_LANGUAGES, JSON.stringify(updated));
+      
+      // Clean up cached phrases for this language
+      this.removeInstalledPhrases(langCode);
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('heimbuerge_languages_changed'));
+      }
+      return updated;
+    } catch (e) {
+      console.error('Error removing installed language', e);
+      return [];
+    }
+  },
+
+  getInstalledPhrases(langCode) {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.INSTALLED_PHRASES);
+      const all = data ? JSON.parse(data) : {};
+      return all[langCode] || {};
+    } catch (e) {
+      console.error('Error reading installed phrases', e);
+      return {};
+    }
+  },
+
+  saveInstalledPhrases(langCode, phrasesMap) {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.INSTALLED_PHRASES);
+      const all = data ? JSON.parse(data) : {};
+      all[langCode] = { ...(all[langCode] || {}), ...phrasesMap };
+      localStorage.setItem(STORAGE_KEYS.INSTALLED_PHRASES, JSON.stringify(all));
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('heimbuerge_phrases_changed'));
+      }
+    } catch (e) {
+      console.error('Error saving installed phrases', e);
+    }
+  },
+
+  removeInstalledPhrases(langCode) {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.INSTALLED_PHRASES);
+      if (!data) return;
+      const all = JSON.parse(data);
+      delete all[langCode];
+      localStorage.setItem(STORAGE_KEYS.INSTALLED_PHRASES, JSON.stringify(all));
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('heimbuerge_phrases_changed'));
+      }
+    } catch (e) {
+      console.error('Error removing installed phrases', e);
     }
   }
 };

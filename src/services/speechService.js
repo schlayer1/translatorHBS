@@ -1,18 +1,23 @@
 import { storageService } from './storageService';
 
-// Map of Ukrainian Cyrillic to German-friendly Latin pronunciation
-const UKRAINIAN_TO_LATIN_MAP = {
+// Map of Cyrillic (Ukrainian & Russian) to German-friendly Latin pronunciation
+const CYRILLIC_TO_LATIN_MAP = {
   'а': 'a', 'б': 'b', 'в': 'w', 'г': 'h', 'ґ': 'g', 'д': 'd', 'е': 'e',
   'є': 'je', 'ж': 'sh', 'з': 's', 'и': 'y', 'і': 'i', 'ї': 'ji', 'й': 'j',
   'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r',
   'с': 'ss', 'т': 't', 'у': 'u', 'ф': 'f', 'х': 'ch', 'ц': 'z', 'ч': 'tsch',
   'ш': 'sch', 'щ': 'schtsch', 'ь': '', 'ю': 'ju', 'я': 'ja',
+  'ы': 'y', 'э': 'e', 'ё': 'jo', 'ъ': '',
   'А': 'A', 'Б': 'B', 'В': 'W', 'Г': 'H', 'Ґ': 'G', 'Д': 'D', 'E': 'E',
   'Є': 'Je', 'Ж': 'Sh', 'З': 'S', 'И': 'Y', 'І': 'I', 'Ї': 'Ji', 'Й': 'J',
   'К': 'K', 'Л': 'L', 'М': 'M', 'N': 'N', 'О': 'O', 'П': 'P', 'Р': 'R',
   'С': 'Ss', 'Т': 'T', 'У': 'U', 'Ф': 'F', 'Х': 'Ch', 'Ц': 'Z', 'Ч': 'Tsch',
   'Ш': 'Sch', 'Щ': 'Schtsch', 'Ь': '', 'Ю': 'Ju', 'Я': 'Ja',
+  'Ы': 'Y', 'Э': 'E', 'Ё': 'Jo', 'Ъ': '',
 };
+
+// Backward-compatible alias
+const UKRAINIAN_TO_LATIN_MAP = CYRILLIC_TO_LATIN_MAP;
 
 // In-Memory Audio Cache & Playback State
 const audioUrlCache = new Map();
@@ -48,6 +53,9 @@ function scoreVoice(voice, targetLangPrefix) {
     score += 30;
   }
   if (targetLangPrefix === 'uk' && (name.includes('lesya') || name.includes('taras') || name.includes('polina') || name.includes('ostap'))) {
+    score += 30;
+  }
+  if (targetLangPrefix === 'ru' && (name.includes('milena') || name.includes('yuri') || name.includes('dmitry') || name.includes('tatyana') || name.includes('katya'))) {
     score += 30;
   }
   if (targetLangPrefix === 'ro' && (name.includes('ioana') || name.includes('alex') || name.includes('andrei') || name.includes('carmen'))) {
@@ -343,17 +351,18 @@ export const speechService = {
   SAMPLE_PHRASES: {
     de: 'Guten Tag, herzlich willkommen an der Staatlichen Regelschule Heimbürgeschule Kahla!',
     uk: 'Доброго дня! Ласкаво просимо до школи Heimbürgeschule.',
+    ru: 'Здравствуйте! Добро пожаловать в школу Heimbürgeschule.',
     ro: 'Bună ziua! Bine ați venit la școala Heimbürgeschule.',
     hu: 'Jó napot kívánok! Üdvözöljük a Heimbürgeschule iskolában.',
   },
 
-  // Generate German phonetic pronunciation for Ukrainian Cyrillic
+  // Generate German phonetic pronunciation for Cyrillic (Ukrainian & Russian)
   generatePhoneticAid(text, targetLang) {
     if (!text) return '';
-    if (targetLang === 'uk') {
+    if (targetLang === 'uk' || targetLang === 'ru') {
       let phonetic = '';
       for (const char of text) {
-        phonetic += UKRAINIAN_TO_LATIN_MAP[char] !== undefined ? UKRAINIAN_TO_LATIN_MAP[char] : char;
+        phonetic += CYRILLIC_TO_LATIN_MAP[char] !== undefined ? CYRILLIC_TO_LATIN_MAP[char] : char;
       }
       return phonetic;
     }

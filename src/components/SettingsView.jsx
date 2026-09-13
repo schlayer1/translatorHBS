@@ -2,7 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { storageService } from '../services/storageService';
 import { geminiService } from '../services/geminiService';
 import { speechService } from '../services/speechService';
-import { SUPPORTED_LANGUAGES } from '../data/languages';
+import { SUPPORTED_LANGUAGES, BUILTIN_LANGUAGES } from '../data/languages';
+import { SCHOOL_PHRASES } from '../data/schoolPhrases';
+import { PARENT_LETTER_TEMPLATES } from '../data/parentLetterTemplates';
+import { translationManager } from '../services/translationManager';
+
+const POPULAR_LANGUAGES_CATALOG = [
+  { code: 'ar', name: 'Arabisch', nativeName: 'العربية', flag: '🇸🇾', speechCode: 'ar-SA', greeting: 'مرحبا', placeholder: 'اكتب رسالة...' },
+  { code: 'fa', name: 'Farsi / Dari', nativeName: 'فارسی', flag: '🇮🇷', speechCode: 'fa-IR', greeting: 'سلام', placeholder: 'پیامی بنویسید...' },
+  { code: 'tr', name: 'Türkisch', nativeName: 'Türkçe', flag: '🇹🇷', speechCode: 'tr-TR', greeting: 'Merhaba', placeholder: 'Bir mesaj yazın...' },
+  { code: 'pl', name: 'Polnisch', nativeName: 'Polski', flag: '🇵🇱', speechCode: 'pl-PL', greeting: 'Dzień dobry', placeholder: 'Wpisz wiadomość...' },
+  { code: 'en', name: 'Englisch', nativeName: 'English', flag: '🇬🇧', speechCode: 'en-US', greeting: 'Hello', placeholder: 'Type a message...' },
+  { code: 'vi', name: 'Vietnamesisch', nativeName: 'Tiếng Việt', flag: '🇻🇳', speechCode: 'vi-VN', greeting: 'Xin chào', placeholder: 'Nhập tin nhắn...' },
+  { code: 'sq', name: 'Albanisch', nativeName: 'Shqip', flag: '🇦🇱', speechCode: 'sq-AL', greeting: 'Përshëndetje', placeholder: 'Shkruani një mesazh...' },
+];
 
 export default function SettingsView({ isForcedOffline, onToggleForceOffline, onOpenOnboarding }) {
   const [apiKey, setApiKey] = useState('');
@@ -12,9 +25,18 @@ export default function SettingsView({ isForcedOffline, onToggleForceOffline, on
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
   const [testResult, setTestResult] = useState(null);
-  const [offlinePacks, setOfflinePacks] = useState({ uk: true, ro: true, hu: true });
+  const [offlinePacks, setOfflinePacks] = useState({ uk: true, ro: true, hu: true, ru: true });
   const [playingVoiceLang, setPlayingVoiceLang] = useState(null);
   const [voiceStatus, setVoiceStatus] = useState(null);
+  const [voicesTick, setVoicesTick] = useState(0);
+
+  // Dynamic language packs state
+  const [installedLanguages, setInstalledLanguages] = useState([]);
+  const [isInstalling, setIsInstalling] = useState(false);
+  const [installProgress, setInstallProgress] = useState(null); // { current, total, name }
+  const [installStatusMsg, setInstallStatusMsg] = useState(null); // { success: bool, text: string }
+  const [showCustomModal, setShowCustomModal] = useState(false);
+  const [customLangInput, setCustomLangInput] = useState({ code: '', name: '', flag: '🌐' });
 
   useEffect(() => {
     const settings = storageService.getSettings();
@@ -23,10 +45,17 @@ export default function SettingsView({ isForcedOffline, onToggleForceOffline, on
     setAutoPronounce(settings.autoPronounce || false);
     setPedagogicalTone(settings.pedagogicalTone || 'student');
     setOfflinePacks(storageService.getOfflinePacks());
+    setInstalledLanguages(storageService.getInstalledLanguages());
 
     const handleVoicesChanged = () => {
       setVoicesTick(t => t + 1);
     };
+
+    const handleLangChanged = () => {
+      setInstalledLanguages(storageService.getInstalledLanguages());
+    };
+
+    window.addEventListener('heimbuerge_languages_changed', handleLangChanged);
 
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       window.speechSynthesis.addEventListener('voiceschanged', handleVoicesChanged);
@@ -34,13 +63,101 @@ export default function SettingsView({ isForcedOffline, onToggleForceOffline, on
       const t2 = setTimeout(handleVoicesChanged, 800);
       const t3 = setTimeout(handleVoicesChanged, 2000);
       return () => {
+        window.removeEventListener('heimbuerge_languages_changed', handleLangChanged);
         window.speechSynthesis.removeEventListener('voiceschanged', handleVoicesChanged);
         clearTimeout(t1);
         clearTimeout(t2);
         clearTimeout(t3);
       };
     }
+
+    return () => {
+      window.removeEventListener('heimbuerge_languages_changed', handleLangChanged);
+    };
   }, []);
+
+  const handleInstallLanguage = async (langItem) => {
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      alert('Für die Installation eines neuen Sprachpakets wird eine aktive Internetverbindung benötigt, um die 29 Schul-Redemittel herunterzuladen.');
+      return;
+    }
+
+    setIsInstalling(true);
+    setInstallStatusMsg(null);
+    const totalItems = SCHOOL_PHRASES.length + PARENT_LETTER_TEMPLATES.length;
+    setInstallProgress({ current: 0, total: totalItems, name: langItem.name });
+
+    const phrasesMap = {};
+    let count = 0;
+
+    try {
+      // 1. Translate all school phrases for offline use
+      for (const phrase of SCHOOL_PHRASES) {
+        try {
+          const res = await translationManager.translateFreeOnline({
+            text: phrase.de,
+            sourceLang: 'de',
+            targetLang: langItem.code
+          });
+          if (res) phrasesMap[phrase.id] = res;
+        } catch (e) {
+          console.warn(`Translation failed for phrase ${phrase.id}`, e);
+        }
+        count++;
+        setInstallProgress({ current: count, total: totalItems, name: langItem.name });
+      }
+
+      // 2. Translate all parent letter templates
+      for (const tmpl of PARENT_LETTER_TEMPLATES) {
+        try {
+          const res = await translationManager.translateFreeOnline({
+            text: tmpl.de,
+            sourceLang: 'de',
+            targetLang: langItem.code
+          });
+          if (res) phrasesMap[tmpl.id] = res;
+        } catch (e) {
+          console.warn(`Translation failed for template ${tmpl.id}`, e);
+        }
+        count++;
+        setInstallProgress({ current: count, total: totalItems, name: langItem.name });
+      }
+
+      // Save phrases and language
+      storageService.saveInstalledPhrases(langItem.code, phrasesMap);
+      storageService.saveInstalledLanguage({
+        ...langItem,
+        description: 'Schüler & Eltern (Offline-Paket)',
+        speechCode: langItem.speechCode || `${langItem.code}-${langItem.code.toUpperCase()}`,
+        hasPhonetics: false
+      });
+
+      setInstallStatusMsg({
+        success: true,
+        text: `Sprachpaket ${langItem.flag} ${langItem.name} erfolgreich installiert! Alle Redemittel und Elternbriefe stehen nun auch offline zur Verfügung.`
+      });
+    } catch (err) {
+      setInstallStatusMsg({
+        success: false,
+        text: `Fehler bei der Installation von ${langItem.name}: ${err?.message || 'Verbindungsfehler'}`
+      });
+    } finally {
+      setIsInstalling(false);
+      setInstallProgress(null);
+      setShowCustomModal(false);
+      setCustomLangInput({ code: '', name: '', flag: '🌐' });
+    }
+  };
+
+  const handleUninstallLanguage = (langCode, langName) => {
+    if (window.confirm(`Möchtest du das Sprachpaket für ${langName} wirklich vom Gerät entfernen?`)) {
+      storageService.removeInstalledLanguage(langCode);
+      setInstallStatusMsg({
+        success: true,
+        text: `Sprachpaket ${langName} wurde erfolgreich entfernt.`
+      });
+    }
+  };
 
   const handleTestConnection = async () => {
     if (!apiKey.trim()) return;
@@ -199,6 +316,10 @@ export default function SettingsView({ isForcedOffline, onToggleForceOffline, on
               <span className="material-symbols-outlined text-[14px] text-emerald-600">check_circle</span>
             </span>
             <span className="px-2.5 py-1 bg-white border border-slate-200 text-slate-800 rounded-full text-xs font-bold flex items-center gap-1 shadow-2xs">
+              <span>🇷🇺 Russisch</span>
+              <span className="material-symbols-outlined text-[14px] text-emerald-600">check_circle</span>
+            </span>
+            <span className="px-2.5 py-1 bg-white border border-slate-200 text-slate-800 rounded-full text-xs font-bold flex items-center gap-1 shadow-2xs">
               <span>🇷🇴 Rumänisch</span>
               <span className="material-symbols-outlined text-[14px] text-emerald-600">check_circle</span>
             </span>
@@ -210,7 +331,211 @@ export default function SettingsView({ isForcedOffline, onToggleForceOffline, on
               <span>📚 Schul-Lexikon</span>
               <span className="material-symbols-outlined text-[14px] text-emerald-600">check_circle</span>
             </span>
+            {installedLanguages.map(l => (
+              <span key={l.code} className="px-2.5 py-1 bg-school-blue/10 border border-school-blue/30 text-school-blueDark rounded-full text-xs font-bold flex items-center gap-1 shadow-2xs">
+                <span>{l.flag} {l.name}</span>
+                <span className="text-[10px] bg-school-blue/20 text-school-blue font-extrabold px-1.5 py-0.2 rounded-full">Offline</span>
+                <button
+                  type="button"
+                  onClick={() => handleUninstallLanguage(l.code, l.name)}
+                  title="Sprachpaket entfernen"
+                  className="hover:text-red-600 transition-colors ml-0.5"
+                >
+                  <span className="material-symbols-outlined text-[14px]">close</span>
+                </button>
+              </span>
+            ))}
           </div>
+        </div>
+      </div>
+
+      {/* 2. Sprachpakete verwalten & erweitern (Variante 2) */}
+      <div className="bg-white rounded-2xl p-4 shadow-sm border border-school-border flex flex-col gap-3.5">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-bold text-school-blue flex items-center gap-1.5">
+            <span className="material-symbols-outlined text-[18px]">language</span>
+            Weitere Sprachen installieren & verwalten
+          </h2>
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+            Dynamischer Generator
+          </span>
+        </div>
+
+        <p className="text-xs text-slate-500 leading-relaxed">
+          Brauchen Kolleginnen oder Kollegen weitere Zielsprachen? Ein Klick genügt: Die App lädt einmalig die Übersetzungen für alle 29 Schul-Redemittel und Elternbriefe herunter und speichert sie fest auf diesem Gerät für die 100%ige Offline-Nutzung.
+        </p>
+
+        {/* Status Toast */}
+        {installStatusMsg && (
+          <div className={`p-3 rounded-xl text-xs flex items-start gap-2 ${
+            installStatusMsg.success 
+              ? 'bg-emerald-50 text-emerald-900 border border-emerald-200' 
+              : 'bg-red-50 text-red-900 border border-red-200'
+          }`}>
+            <span className="material-symbols-outlined text-[18px] shrink-0">
+              {installStatusMsg.success ? 'check_circle' : 'error'}
+            </span>
+            <div className="flex-1">
+              <span>{installStatusMsg.text}</span>
+            </div>
+            <button
+              onClick={() => setInstallStatusMsg(null)}
+              className="text-slate-400 hover:text-slate-600 text-xs"
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
+        {/* Active Progress Bar while installing */}
+        {isInstalling && installProgress && (
+          <div className="p-3.5 rounded-xl bg-school-blue/5 border border-school-blue/20 flex flex-col gap-2">
+            <div className="flex items-center justify-between text-xs font-bold text-school-blue">
+              <span className="flex items-center gap-1.5">
+                <span className="w-3.5 h-3.5 border-2 border-school-blue border-t-transparent rounded-full animate-spin"></span>
+                <span>Installiere Sprachpaket {installProgress.name}...</span>
+              </span>
+              <span>{installProgress.current} / {installProgress.total} Redemittel</span>
+            </div>
+            <div className="w-full h-2 bg-school-blue/10 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-school-blue to-school-teal transition-all duration-300"
+                style={{ width: `${(installProgress.current / installProgress.total) * 100}%` }}
+              />
+            </div>
+            <p className="text-[11px] text-slate-500">
+              Redemittel & Vorlagen werden übersetzt und lokal im Browser gesichert...
+            </p>
+          </div>
+        )}
+
+        {/* Quick Catalog */}
+        <div className="flex flex-col gap-1.5">
+          <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
+            Beliebte Schul-Sprachen (1-Klick-Installation):
+          </span>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {POPULAR_LANGUAGES_CATALOG.map((item) => {
+              const isAlreadyInstalled = installedLanguages.some(l => l.code === item.code);
+              return (
+                <div
+                  key={item.code}
+                  className="p-3 rounded-xl border border-slate-200/80 bg-slate-50/50 flex flex-col justify-between gap-2"
+                >
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xl">{item.flag}</span>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-xs font-bold text-slate-800 truncate">{item.name}</span>
+                      <span className="text-[10px] text-slate-400 font-serif">{item.nativeName}</span>
+                    </div>
+                  </div>
+
+                  {isAlreadyInstalled ? (
+                    <div className="flex items-center justify-between pt-1 border-t border-slate-200/60">
+                      <span className="text-[10px] text-emerald-700 font-bold flex items-center gap-0.5">
+                        <span className="material-symbols-outlined text-[13px]">check_circle</span>
+                        Installiert
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleUninstallLanguage(item.code, item.name)}
+                        className="text-[10px] text-red-500 hover:text-red-700 font-semibold"
+                      >
+                        Löschen
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={isInstalling}
+                      onClick={() => handleInstallLanguage(item)}
+                      className="w-full py-1.5 px-2 rounded-lg bg-white hover:bg-school-blue hover:text-white border border-slate-200 hover:border-school-blue text-school-blue font-bold text-[11px] transition-all active:scale-[0.97] flex items-center justify-center gap-1 shadow-2xs disabled:opacity-50"
+                    >
+                      <span className="material-symbols-outlined text-[14px]">download</span>
+                      <span>Installieren</span>
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Custom Language Manual Entry Modal / Toggle */}
+        <div className="pt-1">
+          {!showCustomModal ? (
+            <button
+              type="button"
+              onClick={() => setShowCustomModal(true)}
+              className="text-xs font-bold text-school-blue hover:underline flex items-center gap-1"
+            >
+              <span className="material-symbols-outlined text-[16px]">add_circle</span>
+              <span>Andere Sprache manuell hinzufügen...</span>
+            </button>
+          ) : (
+            <div className="p-3.5 rounded-xl border border-school-blue/20 bg-slate-50 flex flex-col gap-2.5 animate-in fade-in duration-150">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-800">
+                  Beliebige Sprache installieren
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setShowCustomModal(false)}
+                  className="text-slate-400 hover:text-slate-600 text-xs"
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <div>
+                  <label className="text-[10px] font-semibold text-slate-500 block mb-0.5">Code (ISO)</label>
+                  <input
+                    type="text"
+                    value={customLangInput.code}
+                    onChange={(e) => setCustomLangInput({ ...customLangInput, code: e.target.value.trim().toLowerCase() })}
+                    placeholder="z. B. it"
+                    className="w-full px-2 py-1.5 rounded-lg border border-slate-200 text-xs font-mono bg-white"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-semibold text-slate-500 block mb-0.5">Name</label>
+                  <input
+                    type="text"
+                    value={customLangInput.name}
+                    onChange={(e) => setCustomLangInput({ ...customLangInput, name: e.target.value })}
+                    placeholder="z. B. Italienisch"
+                    className="w-full px-2 py-1.5 rounded-lg border border-slate-200 text-xs bg-white"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-semibold text-slate-500 block mb-0.5">Flagge</label>
+                  <input
+                    type="text"
+                    value={customLangInput.flag}
+                    onChange={(e) => setCustomLangInput({ ...customLangInput, flag: e.target.value })}
+                    placeholder="🇮🇹"
+                    className="w-full px-2 py-1.5 rounded-lg border border-slate-200 text-xs bg-white"
+                  />
+                </div>
+              </div>
+              <button
+                type="button"
+                disabled={isInstalling || !customLangInput.code || !customLangInput.name}
+                onClick={() => handleInstallLanguage({
+                  code: customLangInput.code,
+                  name: customLangInput.name,
+                  nativeName: customLangInput.name,
+                  flag: customLangInput.flag || '🌐',
+                  speechCode: `${customLangInput.code}-${customLangInput.code.toUpperCase()}`,
+                  placeholder: 'Mitteilung eingeben...'
+                })}
+                className="py-2 px-3 rounded-lg bg-school-blue text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-2xs hover:bg-school-blueDark transition-all disabled:opacity-50"
+              >
+                <span className="material-symbols-outlined text-[16px]">download_for_offline</span>
+                <span>Paket jetzt generieren & installieren</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -356,10 +681,11 @@ export default function SettingsView({ isForcedOffline, onToggleForceOffline, on
             Die App nutzt online Googles offizielle HD-Sprach-Engine für natürliche, wohlklingende Aussprache ohne Roboterklang. Offline greift sie automatisch auf die beste Systemstimme deines Geräts zu:
           </p>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-1">
             {[
               { key: 'de', code: 'de-DE', label: 'Deutsch', flag: '🇩🇪' },
               { key: 'uk', code: 'uk-UA', label: 'Ukrainisch', flag: '🇺🇦' },
+              { key: 'ru', code: 'ru-RU', label: 'Russisch', flag: '🇷🇺' },
               { key: 'ro', code: 'ro-RO', label: 'Rumänisch', flag: '🇷🇴' },
               { key: 'hu', code: 'hu-HU', label: 'Ungarisch', flag: '🇭🇺' },
             ].map((item) => {

@@ -9,6 +9,7 @@ export const PARENT_LETTER_TEMPLATES = [
     uk: `Шановні батьки,\n\nщиро запрошуємо вас на особисту бесіду щодо навчальних успіхів вашої дитини в школі Heimbürgeschule.\n\nДата: [Дата] о [Час] у кабінеті [Номер кабінету].\n\nБудь ласка, повідомте нам через EduPage, чи підходить вам цей час.\n\nЗ повагою,\n[Ваше ім'я / Класний керівник]`,
     ro: `Stimați părinți,\n\nvă invităm cu drag la o discuție individuală privind progresul școlar al copilului dumneavoastră la școala Heimbürgeschule.\n\nData: [Data] la ora [Ora] în sala [Nr. sală].\n\nVă rugăm să ne confirmați prin EduPage dacă această oră este potrivită pentru dumneavoastră.\n\nCu stimă,\n[Numele dumneavoastră / Dirigintele]`,
     hu: `Kedves Szülők!\n\nSzeretettel meghívjuk Önöket egy személyes beszélgetésre gyermekük tanulmányi fejlődéséről a Heimbürgeschule iskolában.\n\nIdőpont: [Dátum], [Időpont] órakor a [Teremszám] teremben.\n\nKérjük, az EduPage felületén jelezzék vissza, hogy megfelel-e Önöknek ez az időpont.\n\nÜdvözlettel,\n[Az Ön neve / Osztályfőnök]`,
+    ru: `Уважаемые родители,\n\nсердечно приглашаем вас на личную беседу об успехах и развитии вашего ребёнка в школе Heimbürgeschule.\n\nДата: [Дата] в [Время] в кабинете [Номер кабинета].\n\nПожалуйста, сообщите нам через EduPage, подходит ли вам это время.\n\nС уважением,\n[Ваше имя / Классный руководитель]`,
   },
   {
     id: 'entschuldigung',
@@ -20,6 +21,7 @@ export const PARENT_LETTER_TEMPLATES = [
     uk: `Шановні батьки,\n\nваша дитина була відсутня на заняттях останніми днями. Будь ласка, пам'ятайте, що при кожній відсутності потрібне письмове пояснення від батьків.\n\nБудь ласка, передайте дитині підписану довідку/записку завтра або надішліть її через EduPage.\n\nЩиро дякуємо за співпрацю та бажаємо міцного здоров'я!\n\nЗ повагою,\n[Класний керівник]`,
     ro: `Stimați părinți,\n\ncopilul dumneavoastră a lipsit de la ore în ultimele zile. Vă rugăm să rețineți că pentru orice absență este necesară o scutire scrisă din partea părinților.\n\nVă rugăm să trimiteți mâine scutirea semnată sau să o transmiteți direct prin EduPage.\n\nVă mulțumim pentru colaborare și însănătoșire grabnică!\n\nCu stimă,\n[Dirigintele]`,
     hu: `Kedves Szülők!\n\nGyermekük az elmúlt napokban hiányzott az óráktól. Kérjük, vegyék figyelembe, hogy minden hiányzást írásos szülői igazolással kell igazolni.\n\nKérjük, küldjék el holnap az aláírt igazolást, vagy nyújtsák be közvetlenül az EduPage rendszeren keresztül.\n\nKöszönjük együttműködésüket, és jobbulást kívánunk!\n\nÜdvözlettel,\n[Osztályfőnök]`,
+    ru: `Уважаемые родители,\n\nваш ребёнок отсутствовал на уроках в последние дни. Пожалуйста, помните, что при каждом пропуске требуется письменное объяснение от родителей.\n\nПожалуйста, передайте завтра с ребёнком подписанную объяснительную записку или отправьте её через EduPage.\n\nБольшое спасибо за сотрудничество и скорейшего выздоровления!\n\nС уважением,\n[Классный руководитель]`,
   },
   {
     id: 'ausflug',
@@ -31,6 +33,7 @@ export const PARENT_LETTER_TEMPLATES = [
     uk: `Шановні батьки,\n\n[Дата] ми плануємо спільний похід/екскурсію нашого класу.\n\nЗбір: о [Час] на шкільному подвір'ї Heimbürgeschule.\nПовернення: орієнтовно о [Час].\n\nБудь ласка, подбайте про зручний одяг по погоді, міцне взуття та невеликий ланч-бокс із достатньою кількістю питної води. Вартість поїздки: [Сума] євро.\n\nЗ нетерпінням чекаємо на чудовий день!\n\nЗ повагою,\n[Класний керівник]`,
     ro: `Dragi părinți,\n\npe data de [Data] organizăm o excursie/drumeție cu clasa.\n\nÎntâlnirea: la ora [Ora] în curtea școlii Heimbürgeschule.\nÎntoarcerea: aproximativ la ora [Ora].\n\nVă rugăm să asigurați copilului haine adecvate vremii, încălțăminte comodă și un pachețel cu mâncare și apă. Cost/Bani de drum: [Suma] euro.\n\nNe bucurăm pentru această zi împreună!\n\nCu drag,\n[Dirigintele]`,
     hu: `Kedves Szülők!\n\n[Dátum]-án osztálykirándulást / túranapot szervezünk az osztállyal.\n\nGyülekező: [Időpont] órakor a Heimbürgeschule iskolaudvarán.\nVárható visszaérkezés: kb. [Időpont] órakor.\n\nKérjük, biztosítsanak gyermeküknek időjárásnak megfelelő ruházatot, kényelmes cipőt, valamint tízórait és elegendő ivóvizet. Útiköltség: [Összeg] euró.\n\nBízunk egy szép és élményekben gazdag napban!\n\nÜdvözlettel,\n[Osztályfőnök]`,
+    ru: `Уважаемые родители,\n\n[Дата] мы планируем совместный поход/экскурсию нашего класса.\n\nСбор: в [Время] на школьном дворе Heimbürgeschule.\nВозвращение: ориентировочно в [Время].\n\nПожалуйста, оденьте ребёнка по погоде, обеспечьте удобную обувь и дайте с собой перекус и достаточное количество питьевой воды. Стоимость поездки: [Сумма] евро.\n\nМы с нетерпением ждём этого замечательного дня!\n\nС уважением,\n[Классный руководитель]`,
   },
   {
     id: 'material',
@@ -42,6 +45,7 @@ export const PARENT_LETTER_TEMPLATES = [
     uk: `Шановні батьки,\n\nвашій дитині для уроків наразі бракує таких матеріалів: [наприклад, лінійка, альбом для малювання, клей].\n\nЩоб дитина могла успішно працювати на уроках, просимо придбати ці речі та дати з собою до школи до [День тижня].\n\nЩиро дякуємо за допомогу!\n\nЗ повагою,\n[Вчитель / Класний керівник]`,
     ro: `Stimați părinți,\n\ncopilului dumneavoastră îi lipsesc la ore următoarele materiale: [de exemplu riglă, caiet de desen, lipici].\n\nPentru ca elevul să poată participa activ la ore, vă rugăm să procurați aceste materiale până [Ziua] și să le trimiteți la școală.\n\nVă mulțumim pentru sprijin!\n\nCu stimă,\n[Profesorul / Dirigintele]`,
     hu: `Kedves Szülők!\n\nGyermekének jelenleg a következő felszerelés hiányzik az órákon: [pl. vonalzó, rajzfüzet, ragasztó].\n\nKérjük, szerezzék be ezeket a dolgokat [Nap]-ig, és adják oda a gyermeknek, hogy aktívan részt vehessen az órai munkában.\n\nKöszönjük az együttműködést!\n\nÜdvözlettel,\n[Szaktanár / Osztályfőnök]`,
+    ru: `Уважаемые родители,\n\nвашему ребёнку для уроков в настоящее время не хватает следующих материалов: [например, линейка, альбом для рисования, клей].\n\nЧтобы ребёнок мог успешно заниматься на уроках, просим приобрести эти принадлежности и дать их в школу до [День недели].\n\nБольшое спасибо за помощь!\n\nС уважением,\n[Учитель-предметник / Классный руководитель]`,
   },
   {
     id: 'lob',
@@ -53,5 +57,6 @@ export const PARENT_LETTER_TEMPLATES = [
     uk: `Шановні батьки,\n\nхочу поділитися з вами дуже приємною новиною: ваша дитина останнім часом докладає великих зусиль і показує чудові успіхи в навчанні. Її поведінка в колективі також була зразковою!\n\nМи щиро радіємо такому чудовому розвитку вашої дитини.\n\nЗ повагою,\n[Класний керівник]`,
     ro: `Dragi părinți,\n\ndoresc să vă transmit o veste foarte bună: copilul dumneavoastră a depus mult efort în ultima perioadă și a înregistrat progrese remarcabile. Comportamentul său în colectiv a fost exemplar!\n\nNe bucurăm din suflet pentru această evoluție frumoasă.\n\nCu drag,\n[Dirigintele]`,
     hu: `Kedves Szülők!\n\nNagyon örömteli hírt szeretnék megosztani Önökkel: gyermeke az utóbbi időben sokat igyekezett, és nagyszerű fejlődést mutatott. A közösségi viselkedése is példamutató volt!\n\nNagyon örülünk ennek a szép eredménynek.\n\nÜdvözlettel,\n[Osztályfőnök]`,
+    ru: `Уважаемые родители,\n\nсегодня я хочу поделиться с вами очень радостной новостью: ваш ребёнок в последнее время очень старался и добился больших успехов. Поведение в коллективе класса также было образцовым!\n\nМы очень рады такому замечательному развитию вашего ребёнка.\n\nС уважением,\n[Классный руководитель]`,
   },
 ];

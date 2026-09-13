@@ -25,7 +25,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { SCHOOL_CATEGORIES, SCHOOL_PHRASES } from '../data/schoolPhrases';
-import { SUPPORTED_LANGUAGES, getLanguage } from '../data/languages';
+import { SUPPORTED_LANGUAGES, getLanguage, useSupportedLanguages } from '../data/languages';
 import { speechService } from '../services/speechService';
 import { storageService } from '../services/storageService';
 import { translationManager } from '../services/translationManager';
@@ -42,6 +42,7 @@ const CATEGORY_ICONS = {
 };
 
 export default function SchoolPhrasesView({ onTransferToTranslator }) {
+  const supportedLanguages = useSupportedLanguages();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [targetLang, setTargetLang] = useState('uk');
   const [searchQuery, setSearchQuery] = useState('');
@@ -55,8 +56,13 @@ export default function SchoolPhrasesView({ onTransferToTranslator }) {
   const [isTranslatingNew, setIsTranslatingNew] = useState(false);
 
   const recognizerRef = useRef(null);
-
   const targetLangObj = getLanguage(targetLang);
+
+  const getPhraseText = (phrase, lang) => {
+    if (phrase[lang]) return phrase[lang];
+    const installed = storageService.getInstalledPhrases(lang);
+    return installed[phrase.id] || '';
+  };
 
   const toggleSearchSpeech = () => {
     if (isSearchingVoice) {
@@ -102,15 +108,17 @@ export default function SchoolPhrasesView({ onTransferToTranslator }) {
 
     const q = searchQuery.toLowerCase().trim();
     if (!q) return matchesCat;
+    const tgtText = getPhraseText(p, targetLang);
+    const phonetic = p[`${targetLang}_phonetic`] || '';
     const matchesSearch = 
       p.de.toLowerCase().includes(q) || 
-      (p[targetLang] && p[targetLang].toLowerCase().includes(q)) ||
-      (p.uk_phonetic && p.uk_phonetic.toLowerCase().includes(q));
+      (tgtText && tgtText.toLowerCase().includes(q)) ||
+      (phonetic && phonetic.toLowerCase().includes(q));
     return matchesCat && matchesSearch;
   });
 
   const handleSpeak = (phrase) => {
-    const text = phrase[targetLang];
+    const text = getPhraseText(phrase, targetLang);
     setPlayingId(phrase.id);
     speechService.speak({
       text,
@@ -122,7 +130,7 @@ export default function SchoolPhrasesView({ onTransferToTranslator }) {
 
   // Zweisprachiges Kopieren (Deutsch + Zielsprache)
   const handleCopyBilingual = (phrase) => {
-    const targetText = phrase[targetLang] || '';
+    const targetText = getPhraseText(phrase, targetLang);
     const bilingualContent = `${phrase.de}\n${targetText}`.trim();
     if (!bilingualContent) return;
 
@@ -133,12 +141,13 @@ export default function SchoolPhrasesView({ onTransferToTranslator }) {
   };
 
   const handleBookmark = (phrase) => {
+    const targetText = getPhraseText(phrase, targetLang);
     storageService.addBookmark({
       sourceText: phrase.de,
-      targetText: phrase[targetLang],
+      targetText,
       sourceLang: 'de',
       targetLang,
-      phonetic: phrase.uk_phonetic,
+      phonetic: phrase[`${targetLang}_phonetic`] || ((targetLang === 'uk' || targetLang === 'ru') ? speechService.generatePhoneticAid(targetText, targetLang) : ''),
       category: phrase.category,
     });
   };
@@ -158,6 +167,7 @@ export default function SchoolPhrasesView({ onTransferToTranslator }) {
     try {
       const german = newGermanText.trim();
       let ukText = '';
+      let ruText = '';
       let roText = '';
       let huText = '';
 
@@ -166,6 +176,13 @@ export default function SchoolPhrasesView({ onTransferToTranslator }) {
         ukText = resUk || '';
       } catch (err) {
         console.warn('UK translation failed', err);
+      }
+
+      try {
+        const resRu = await translationManager.translateFreeOnline({ text: german, sourceLang: 'de', targetLang: 'ru' });
+        ruText = resRu || '';
+      } catch (err) {
+        console.warn('RU translation failed', err);
       }
 
       try {
@@ -186,6 +203,7 @@ export default function SchoolPhrasesView({ onTransferToTranslator }) {
         de: german,
         category: newCategory,
         uk: ukText,
+        ru: ruText,
         ro: roText,
         hu: huText,
       });
@@ -213,7 +231,7 @@ export default function SchoolPhrasesView({ onTransferToTranslator }) {
             onChange={(e) => setTargetLang(e.target.value)}
             className="w-full h-10 pl-3 pr-8 rounded-xl bg-white border border-slate-200/80 text-slate-800 text-xs font-bold shadow-2xs appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-school-blue/20"
           >
-            {SUPPORTED_LANGUAGES.filter(l => l.code !== 'de').map((l) => (
+            {supportedLanguages.filter(l => l.code !== 'de').map((l) => (
               <option key={l.code} value={l.code}>
                 {l.flag} Zielsprache: {l.name}
               </option>
@@ -393,7 +411,8 @@ export default function SchoolPhrasesView({ onTransferToTranslator }) {
       <div className="flex flex-col gap-3">
         {filteredPhrases.length > 0 ? (
           filteredPhrases.map((phrase) => {
-            const targetText = phrase[targetLang] || 'Übersetzung folgt';
+            const targetText = getPhraseText(phrase, targetLang) || 'Übersetzung folgt';
+            const phonetic = phrase[`${targetLang}_phonetic`] || ((targetLang === 'uk' || targetLang === 'ru') ? speechService.generatePhoneticAid(targetText, targetLang) : '');
             const isPlaying = playingId === phrase.id;
             const isCopied = copiedId === phrase.id;
 
@@ -427,10 +446,10 @@ export default function SchoolPhrasesView({ onTransferToTranslator }) {
                     {targetText}
                   </p>
 
-                  {/* Phonetic for Ukrainian */}
-                  {targetLang === 'uk' && phrase.uk_phonetic && (
+                  {/* Phonetic for Ukrainian & Russian */}
+                  {phonetic && (
                     <p className="text-xs text-school-orange font-semibold italic mt-0.5">
-                      Lautschrift: "{phrase.uk_phonetic}"
+                      Lautschrift: "{phonetic}"
                     </p>
                   )}
                 </div>
