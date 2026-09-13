@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Sparkles, 
   Languages, 
@@ -12,7 +12,9 @@ import {
   X, 
   HelpCircle,
   ShieldCheck,
-  ArrowRight
+  ArrowRight,
+  Download,
+  Globe
 } from 'lucide-react';
 import { storageService } from '../services/storageService';
 import { geminiService } from '../services/geminiService';
@@ -118,7 +120,7 @@ export default function OnboardingModal({ isOpen, onClose, onApiKeySaved }) {
           {step === 1 ? (
             <>
               <p className="text-slate-600 text-xs leading-relaxed">
-                Der Schul-Übersetzer wurde speziell für den Schulalltag der <strong>Heimbürgeschule</strong> entwickelt, um Sprachbarrieren mit ukrainischen, rumänischen und ungarischen Schülerinnen, Schülern und Eltern mühelos zu überwinden.
+                Der Schul-Übersetzer wurde speziell für den Schulalltag der <strong>Heimbürgeschule Kahla</strong> entwickelt, um Sprachbarrieren mit Schülerinnen, Schülern und Familien mühelos zu überwinden – <strong>auch komplett ohne Internet (100% offline)</strong>.
               </p>
 
               {/* Core Features Cards */}
@@ -128,10 +130,27 @@ export default function OnboardingModal({ isOpen, onClose, onApiKeySaved }) {
                     <div className="w-6 h-6 rounded-lg bg-school-blue/10 flex items-center justify-center">
                       <Languages className="w-3.5 h-3.5 text-school-blue" />
                     </div>
-                    <span>Gezielt Übersetzen</span>
+                    <span>5 feste Schulsprachen</span>
                   </div>
                   <p className="text-[11px] text-slate-500 leading-normal">
-                    Schnelle Übersetzung ins Ukrainische, Rumänische und Ungarische – per Knopfdruck oder Spracheingabe.
+                    🇺🇦 Ukrainisch, 🇷🇺 Russisch, 🇷🇴 Rumänisch und 🇭🇺 Ungarisch sind mit Redemitteln und Lautschrift fest im System – 100% offline einsatzbereit.
+                  </p>
+                </div>
+
+                <div className="p-3 rounded-2xl bg-blue-50/60 border border-school-blue/30 flex flex-col gap-1.5 relative overflow-hidden">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-school-blue font-bold text-xs">
+                      <div className="w-6 h-6 rounded-lg bg-school-blue/15 flex items-center justify-center">
+                        <Download className="w-3.5 h-3.5 text-school-blue" />
+                      </div>
+                      <span>Sprachen-Download</span>
+                    </div>
+                    <span className="px-1.5 py-0.2 rounded-full bg-school-blue text-white text-[9px] font-extrabold uppercase">
+                      Neu
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 leading-normal">
+                    Beliebige weitere Sprachen (z. B. 🇸🇾 Arabisch, 🇮🇷 Farsi, 🇹🇷 Türkisch, 🇵🇱 Polnisch) in den Optionen mit 1 Klick für die Offline-Nutzung nachrüsten.
                   </p>
                 </div>
 
@@ -140,10 +159,10 @@ export default function OnboardingModal({ isOpen, onClose, onApiKeySaved }) {
                     <div className="w-6 h-6 rounded-lg bg-school-teal/10 flex items-center justify-center">
                       <Mail className="w-3.5 h-3.5 text-school-teal" />
                     </div>
-                    <span>Elternbriefe</span>
+                    <span>Elternbriefe & EduPage</span>
                   </div>
                   <p className="text-[11px] text-slate-500 leading-normal">
-                    Schultexte formulieren und zweisprachig mit Trennlinie direkt kopieren.
+                    Schultexte formulieren, mit KI veredeln und zweisprachig mit Trennlinie direkt für EduPage kopieren.
                   </p>
                 </div>
 
@@ -152,22 +171,10 @@ export default function OnboardingModal({ isOpen, onClose, onApiKeySaved }) {
                     <div className="w-6 h-6 rounded-lg bg-school-orange/10 flex items-center justify-center">
                       <BookOpen className="w-3.5 h-3.5 text-school-orange" />
                     </div>
-                    <span>Redemittel & Vorlagen</span>
+                    <span>29 Redemittel & 2-Wege-Dialog</span>
                   </div>
                   <p className="text-[11px] text-slate-500 leading-normal">
-                    Praxisnahe Schulsätze für Unterricht & Hausaufgaben nutzen, anhören oder eigene Vorlagen anlegen.
-                  </p>
-                </div>
-
-                <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col gap-1.5">
-                  <div className="flex items-center gap-2 text-indigo-700 font-bold text-xs">
-                    <div className="w-6 h-6 rounded-lg bg-indigo-500/10 flex items-center justify-center">
-                      <MessagesSquare className="w-3.5 h-3.5 text-indigo-600" />
-                    </div>
-                    <span>2-Wege-Gespräch</span>
-                  </div>
-                  <p className="text-[11px] text-slate-500 leading-normal">
-                    Geteilter Bildschirm für Elterngespräche: Deutsch oben, Zielsprache unten mit Audio-Ausgabe.
+                    Praxisnahe Schulsätze für Unterricht & Hausaufgaben, eigene Vorlagen anlegen oder Tisch-Modus für Gespräche nutzen.
                   </p>
                 </div>
               </div>
@@ -185,7 +192,7 @@ export default function OnboardingModal({ isOpen, onClose, onApiKeySaved }) {
                     </span>
                   </span>
                   <p className="text-[11px] text-slate-600 leading-relaxed">
-                    Mit <strong>Google Gemini</strong> passt die App Texte auf Wunsch an (z. B. <em>kindgerecht vereinfacht</em> oder <em>höflicher Eltern-Ton</em>) und generiert phonetische Lautschrift zum schnellen Mitlesen.
+                    Mit <strong>Google Gemini</strong> passt die App Texte auf Wunsch an (z. B. <em>kindgerecht vereinfacht</em> oder <em>höflicher Eltern-Ton</em>) – für alle festen und nachgeladenen Sprachen, inklusive Lautschrift.
                   </p>
                 </div>
               </div>
