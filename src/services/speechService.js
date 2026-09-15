@@ -19,9 +19,17 @@ const CYRILLIC_TO_LATIN_MAP = {
 // Backward-compatible alias
 const UKRAINIAN_TO_LATIN_MAP = CYRILLIC_TO_LATIN_MAP;
 
-// In-Memory Audio Cache & Playback State
-const audioUrlCache = new Map();
+// Retain active utterance globally to prevent Safari WebKit garbage collection bug
+let activeUtterance = null;
+let keepAliveTimer = null;
 let currentAudioElement = null;
+
+function clearKeepAlive() {
+  if (keepAliveTimer) {
+    clearInterval(keepAliveTimer);
+    keepAliveTimer = null;
+  }
+}
 
 // Priority scoring for natural, warm, human-like OS voices (Neural, Enhanced, Siri, Google)
 function scoreVoice(voice, targetLangPrefix) {
@@ -221,132 +229,227 @@ export const speechService = {
     });
   },
 
-  // Play audio from Blob URL
+  // Play audio from URL with iOS WebKit watchdog and stream release
   playAudioUrl(url, rate = 1.0, onStart, onEnd, onError) {
     this.stopSpeaking();
     try {
-      const audio = new Audio(url);
+      const audio = new Audio();
+      audio.preload = 'auto';
       audio.playbackRate = Math.max(0.75, Math.min(1.3, rate));
       currentAudioElement = audio;
 
-      audio.onplay = () => onStart?.();
+      let started = false;
+      let timeoutId = null;
+
+      const cleanup = () => {
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+          timeoutId = null;
+        }
+        if (currentAudioElement === audio) {
+          currentAudioElement = null;
+        }
+      };
+
+      // iOS Safari Watchdog: if audio stream stalls without firing onplay or onerror, fallback safely
+      timeoutId = setTimeout(() => {
+        if (!started) {
+          console.warn('[TTS] Audio playback timed out (iOS stream stall) - triggering fallback');
+          cleanup();
+          try {
+            audio.pause();
+            audio.removeAttribute('src');
+            audio.load();
+          } catch (e) {}
+          onError?.(new Error('Audio stream timed out'));
+        }
+      }, 2200);
+
+      audio.onplay = () => {
+        started = true;
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+          timeoutId = null;
+        }
+        onStart?.();
+      };
+
       audio.onended = () => {
-        currentAudioElement = null;
+        cleanup();
+        try {
+          audio.removeAttribute('src');
+          audio.load();
+        } catch (e) {}
         onEnd?.();
       };
+
       audio.onerror = (e) => {
-        currentAudioElement = null;
+        console.warn('[TTS] Audio element error:', e);
+        cleanup();
+        try {
+          audio.removeAttribute('src');
+          audio.load();
+        } catch (err) {}
         onError?.(e);
       };
+
+      audio.src = url;
+      audio.load();
 
       const promise = audio.play();
       if (promise !== undefined) {
         promise.catch((err) => {
-          console.warn('[Audio] Autoplay / Play error:', err);
-          currentAudioElement = null;
+          console.warn('[TTS] Audio play() promise rejected:', err);
+          cleanup();
+          try {
+            audio.removeAttribute('src');
+            audio.load();
+          } catch (e) {}
           onError?.(err);
         });
       }
     } catch (err) {
+      console.warn('[TTS] playAudioUrl error:', err);
       currentAudioElement = null;
       onError?.(err);
     }
   },
 
-  // Natural Human-Like Speech (Prefers Gemini 2.0 Studio AI Audio, falls back to System Synthesizer)
-  async speak({ text, lang = 'de-DE', rate = 1.0, onStart, onEnd, onError, onStatus, forceBrowserSynth = false }) {
+  // Natural Human-Like Speech (Online: Google HD Stream via /api/tts; Offline: Local System Synthesis)
+  speak({ text, lang = 'de-DE', rate = 1.0, onStart, onEnd, onError, onStatus, forceBrowserSynth = false }) {
     this.stopSpeaking();
     if (!text || !text.trim()) return;
 
+    const cleanText = text.trim();
     const shortLang = lang.split('-')[0].toLowerCase();
-    const cacheKey = `${shortLang}:${text.trim()}`;
+    const isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
 
-    // 1. Check if cached natural audio URL is already available in memory
-    if (!forceBrowserSynth && audioUrlCache.has(cacheKey)) {
-      onStatus?.({ engine: 'Google HD-Audio (aus Speicher)', isAI: true });
-      const cachedUrl = audioUrlCache.get(cacheKey);
-      this.playAudioUrl(cachedUrl, rate, onStart, onEnd, onError);
+    // 1. Try Google HD-Stimme via our Vercel Serverless Endpoint (/api/tts)
+    // Delivers clear, human-sounding studio voice on ANY iPad/iPhone without requiring iOS Siri voice downloads!
+    if (!forceBrowserSynth && isOnline && cleanText.length < 800) {
+      const ttsUrl = `/api/tts?text=${encodeURIComponent(cleanText)}&lang=${shortLang}`;
+      onStatus?.({ engine: 'Google HD-Stimme (Natürlich)', isAI: true });
+
+      this.playAudioUrl(
+        ttsUrl,
+        rate,
+        onStart,
+        onEnd,
+        (playErr) => {
+          console.warn('[TTS] HD-Stream fehlgeschlagen, wechsle auf Systemstimme:', playErr);
+          onStatus?.({ engine: 'Geräte-Systemstimme (Fallback)', isAI: false });
+          this.speakWithBrowserSynth({ text: cleanText, lang, rate, onStart, onEnd, onError });
+        }
+      );
       return;
     }
 
-    // 2. Try Google Translate HD Audio (Free, clear, human-like voice, works online on Mac/iOS/Android)
-    const isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
-    if (!forceBrowserSynth && isOnline && text.trim().length < 400) {
-      try {
-        const encodedText = encodeURIComponent(text.trim());
-        const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodedText}&tl=${shortLang}&client=tw-ob`;
-        
-        onStatus?.({ engine: 'Google HD-Stimme (Natürlich)', isAI: true });
-        
-        // Cache the URL for zero-latency replay
-        audioUrlCache.set(cacheKey, ttsUrl);
-        
-        this.playAudioUrl(
-          ttsUrl,
-          rate,
-          onStart,
-          onEnd,
-          (playErr) => {
-            console.warn('[TTS] Google Audio Playback Fehler, wechsle auf Systemstimme:', playErr);
-            onStatus?.({ engine: 'Geräte-Systemstimme (Fallback)', isAI: false });
-            this.speakWithBrowserSynth({ text, lang, rate, onStart, onEnd, onError });
-          }
-        );
-        return;
-      } catch (gErr) {
-        console.warn('[TTS] Google Audio Vorbereitung fehlgeschlagen:', gErr);
-      }
-    }
-
-    // 3. Fallback: Browser Speech Synthesis (Offline & Custom local voices)
-    const bestVoice = this.getBestVoice(lang);
-    onStatus?.({ 
-      engine: `Geräte-Systemstimme: ${bestVoice ? bestVoice.name : 'Standard'}`, 
-      isAI: false 
-    });
-    this.speakWithBrowserSynth({ text, lang, rate, onStart, onEnd, onError });
+    // 2. Offline / Direct fallback
+    this.speakWithBrowserSynth({ text: cleanText, lang, rate, onStart, onEnd, onError, onStatus });
   },
 
   // Fallback: Local OS SpeechSynthesis
-  speakWithBrowserSynth({ text, lang = 'de-DE', rate = 1.0, onStart, onEnd, onError }) {
+  speakWithBrowserSynth({ text, lang = 'de-DE', rate = 1.0, onStart, onEnd, onError, onStatus }) {
+    if (!text || !text.trim()) return;
+
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
       onError?.(new Error('Sprachausgabe nicht verfügbar'));
       return;
     }
 
-    const utterance = new SpeechSynthesisUtterance(text);
+    this.stopSpeaking();
+
+    const cleanText = text.trim();
+    const bestVoice = this.getBestVoice(lang);
+
+    onStatus?.({
+      engine: bestVoice ? `${bestVoice.name}` : 'Systemstimme',
+      isAI: false
+    });
+
+    const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.lang = lang;
-    
-    // Only adjust rate if not standard (WebKit pitch manipulation introduces metallic robot resynthesis)
+
     if (rate && Math.abs(rate - 1.0) > 0.05) {
-      utterance.rate = Math.max(0.8, Math.min(1.2, rate));
+      utterance.rate = Math.max(0.75, Math.min(1.25, rate));
     }
 
-    const bestVoice = this.getBestVoice(lang);
     if (bestVoice) {
       utterance.voice = bestVoice;
     }
 
-    utterance.onstart = () => onStart?.();
-    utterance.onend = () => onEnd?.();
+    // Retain globally to prevent Safari WebKit garbage collection bug
+    activeUtterance = utterance;
+    window._activeUtterance = utterance;
+
+    utterance.onstart = () => {
+      clearKeepAlive();
+      // iOS WebKit keep-alive for longer sentences (Safari suspends speech after 10-14s)
+      keepAliveTimer = setInterval(() => {
+        if (typeof window !== 'undefined' && window.speechSynthesis && window.speechSynthesis.speaking) {
+          window.speechSynthesis.pause();
+          window.speechSynthesis.resume();
+        } else {
+          clearKeepAlive();
+        }
+      }, 10000);
+      onStart?.();
+    };
+
+    utterance.onend = () => {
+      clearKeepAlive();
+      activeUtterance = null;
+      window._activeUtterance = null;
+      onEnd?.();
+    };
+
     utterance.onerror = (e) => {
-      console.warn('TTS error', e);
+      clearKeepAlive();
+      activeUtterance = null;
+      window._activeUtterance = null;
+      // In iOS Safari, 'interrupted' or 'canceled' happens when stopSpeaking() was called, not an actual error
+      if (e.error === 'interrupted' || e.error === 'canceled') {
+        onEnd?.();
+        return;
+      }
+      console.warn('[TTS] Synthesis error:', e);
       onError?.(e);
     };
 
-    window.speechSynthesis.speak(utterance);
+    // On iOS Safari, a 20ms pause after stopSpeaking() ensures the WebKit cancel IPC queue is flushed
+    setTimeout(() => {
+      try {
+        if (window.speechSynthesis.paused) {
+          window.speechSynthesis.resume();
+        }
+        window.speechSynthesis.speak(utterance);
+      } catch (err) {
+        console.warn('[TTS] Exception calling speak():', err);
+        clearKeepAlive();
+        activeUtterance = null;
+        window._activeUtterance = null;
+        onError?.(err);
+      }
+    }, 20);
   },
 
   stopSpeaking() {
+    clearKeepAlive();
+    activeUtterance = null;
+    window._activeUtterance = null;
+
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      try {
+        window.speechSynthesis.cancel();
+      } catch (e) {}
+    }
     if (currentAudioElement) {
       try {
         currentAudioElement.pause();
-        currentAudioElement.currentTime = 0;
+        currentAudioElement.removeAttribute('src');
+        currentAudioElement.load();
       } catch (e) {}
       currentAudioElement = null;
-    }
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
     }
   },
 
