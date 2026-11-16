@@ -58,8 +58,8 @@ export const translationManager = {
       simplifiedNote: '',
     };
 
-    // 1. If online and API key exists, attempt Gemini Cloud AI
-    if (online && settings.apiKey) {
+    // 1. If online, attempt Gemini Cloud AI via secure server proxy (or personal BYOK key)
+    if (online) {
       try {
         const geminiRes = await geminiService.translate({
           text,
@@ -71,7 +71,11 @@ export const translationManager = {
           apiKey: settings.apiKey,
         });
 
-        const modelName = geminiRes.modelUsed === 'gemini-3.6-flash' ? 'Gemini 3.6 Flash' : (geminiRes.modelUsed || 'Gemini Flash');
+        const modelName = geminiRes.modelUsed === 'gemini-4-hydrogen'
+          ? 'Gemini 4 Hydrogen'
+          : geminiRes.modelUsed === 'gemini-3.6-flash'
+          ? 'Gemini 3.6 Flash'
+          : (geminiRes.modelUsed || 'Gemini Flash');
         const toneName = settings.pedagogicalTone === 'parent' ? 'Eltern-Modus' : 'Schüler-Modus';
 
         result = {

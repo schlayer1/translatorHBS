@@ -118,19 +118,7 @@ export default function ParentLetterView({ isForcedOffline = false }) {
       const settings = storageService.getSettings();
       const apiKey = settings.apiKey;
 
-      if (!apiKey && !isForcedOffline && (typeof navigator !== 'undefined' && navigator.onLine)) {
-        // Free online translation fallback
-        const flag = targetLangObj.flag;
-        const translated = await translationManager.translateFreeOnline({ text: draftText, sourceLang: 'de', targetLang });
-        setPolishedGerman(draftText);
-        setTranslatedLetter(translated);
-        setBilingualText(`🇩🇪 [Deutsche Mitteilung für EduPage]\n${draftText}\n\n────────────────────────────────────\n${flag} [${targetLangObj.name} / Übersetzung für die Familie]\n${translated}`);
-        setWritingTip('Tipp: Für erweiterte Formulierungshilfen (DeepL-Write-Stil) kann in den Optionen ein kostenloser Gemini-Key eingetragen werden.');
-        setIsLoading(false);
-        return;
-      }
-
-      if (!apiKey || isForcedOffline || (typeof navigator !== 'undefined' && !navigator.onLine)) {
+      if (isForcedOffline || (typeof navigator !== 'undefined' && !navigator.onLine)) {
         // Offline Fallback: Find closest template or create basic bilingual export
         const flag = targetLangObj.flag;
         setPolishedGerman(draftText);
@@ -141,16 +129,26 @@ export default function ParentLetterView({ isForcedOffline = false }) {
         return;
       }
 
-      const res = await geminiService.polishAndTranslateParentLetter({
-        germanDraft: draftText,
-        targetLang,
-        apiKey,
-      });
+      try {
+        const res = await geminiService.polishAndTranslateParentLetter({
+          germanDraft: draftText,
+          targetLang,
+          apiKey,
+        });
 
-      setPolishedGerman(res.polishedGerman);
-      setTranslatedLetter(res.translatedLetter);
-      setBilingualText(res.bilingualEduPageText);
-      setWritingTip(res.writingTips || '');
+        setPolishedGerman(res.polishedGerman);
+        setTranslatedLetter(res.translatedLetter);
+        setBilingualText(res.bilingualEduPageText);
+        setWritingTip(res.writingTips || '');
+      } catch (geminiErr) {
+        console.warn('Gemini parent letter failed, trying free online fallback:', geminiErr);
+        const flag = targetLangObj.flag;
+        const translated = await translationManager.translateFreeOnline({ text: draftText, sourceLang: 'de', targetLang });
+        setPolishedGerman(draftText);
+        setTranslatedLetter(translated);
+        setBilingualText(`🇩🇪 [Deutsche Mitteilung für EduPage]\n${draftText}\n\n────────────────────────────────────\n${flag} [${targetLangObj.name} / Übersetzung für die Familie]\n${translated}`);
+        setWritingTip('Direktübersetzung aktiv (Gemini-Schliff aktuell nicht erreichbar).');
+      }
     } catch (err) {
       console.error('Parent letter polish failed:', err);
       setErrorMessage(err.message || 'Fehler bei der Textoptimierung.');

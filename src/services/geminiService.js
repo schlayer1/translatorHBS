@@ -1,142 +1,100 @@
 import { getLanguage } from '../data/languages';
 
-// Robust Google Gemini API client with precise model matching & live test
-let cachedWorkingModel = null;
-let cachedApiVersion = 'v1beta';
-
-// Known stable model identifiers in order of preference
+// Known stable Free-Tier model identifiers in order of preference
 const TRUSTED_MODELS = [
-  'gemini-2.0-flash',
-  'gemini-1.5-flash',
-  'gemini-flash-latest',
+  'gemini-4-hydrogen',
+  'gemini-flash-lite-latest',
+  'gemini-3.5-flash-lite',
+  'gemini-3.8-flash',
   'gemini-3.6-flash',
-  'gemini-1.5-pro',
+  'gemini-flash-latest',
 ];
 
-// Discover working model directly from Google API
-export async function discoverBestModel(key) {
-  if (cachedWorkingModel) {
-    return { model: cachedWorkingModel, version: cachedApiVersion };
-  }
+let cachedWorkingModel = null;
 
-  try {
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
-    if (res.ok) {
-      const data = await res.json();
-      const models = data.models || [];
-      
-      // Filter models that strictly support generateContent and are NOT deprecated/experimental 8b/2.5
-      const supported = models.filter(m => {
-        const name = m.name || '';
-        const methods = m.supportedGenerationMethods || [];
-        return (
-          methods.includes('generateContent') &&
-          !name.includes('8b') &&
-          !name.includes('2.5') &&
-          !name.includes('embedding') &&
-          !name.includes('aqa')
-        );
-      });
-
-      // Find best match among trusted models
-      for (const trusted of TRUSTED_MODELS) {
-        const found = supported.find(m => m.name === `models/${trusted}` || m.name.endsWith(`/${trusted}`));
-        if (found) {
-          const cleanName = found.name.replace(/^models\//, '');
-          cachedWorkingModel = cleanName;
-          cachedApiVersion = 'v1beta';
-          console.log(`[Gemini] Modell verifiziert: ${cleanName}`);
-          return { model: cleanName, version: 'v1beta' };
-        }
-      }
-
-      // If no exact trusted match, pick any flash model with generateContent
-      const anyFlash = supported.find(m => m.name.includes('flash'));
-      if (anyFlash) {
-        const cleanName = anyFlash.name.replace(/^models\//, '');
-        cachedWorkingModel = cleanName;
-        cachedApiVersion = 'v1beta';
-        return { model: cleanName, version: 'v1beta' };
-      }
-
-      // Otherwise pick first supported model
-      if (supported.length > 0) {
-        const cleanName = supported[0].name.replace(/^models\//, '');
-        cachedWorkingModel = cleanName;
-        cachedApiVersion = 'v1beta';
-        return { model: cleanName, version: 'v1beta' };
-      }
-    }
-  } catch (e) {
-    console.warn('[Gemini] Live-Abfrage fehlgeschlagen, nutze Fallbacks:', e);
-  }
-
-  // Fallback defaults
-  return { model: 'gemini-2.0-flash', version: 'v1beta' };
+export async function discoverBestModel() {
+  return { model: cachedWorkingModel || TRUSTED_MODELS[0], version: 'v1beta' };
 }
 
 async function executeGeminiRequest({ key, systemInstruction, prompt, temperature = 0.2 }) {
-  const { model: primaryModel } = await discoverBestModel(key);
-  
-  // Build candidate order without deprecated 8b or 2.5
-  const candidateModels = [
-    primaryModel,
-    ...TRUSTED_MODELS.filter(m => m !== primaryModel),
-  ];
+  const customKey = (key || '').trim();
 
-  const apiVersions = ['v1beta', 'v1'];
+  // 1. Primärer Pfad: Sicherer Serverless-Proxy (/api/gemini)
+  try {
+    const proxyRes = await fetch('/api/gemini', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        apiKey: customKey || 'serverless-proxy',
+        systemPrompt: systemInstruction,
+        userPrompt: prompt,
+        model: cachedWorkingModel || 'auto',
+        temperature,
+        responseMimeType: 'application/json',
+      }),
+    });
+
+    if (proxyRes.ok) {
+      const data = await proxyRes.json();
+      if (data?.text) {
+        cachedWorkingModel = data.model || TRUSTED_MODELS[0];
+        return {
+          candidateText: data.text,
+          modelUsed: cachedWorkingModel,
+          versionUsed: 'v1beta',
+        };
+      }
+    }
+
+    if (proxyRes.status !== 404) {
+      const errData = await proxyRes.json().catch(() => ({}));
+      throw new Error(errData?.error || `HTTP ${proxyRes.status} vom Gemini-Proxy`);
+    }
+  } catch (proxyErr) {
+    if (proxyErr?.message && !proxyErr.message.includes('404')) {
+      throw proxyErr;
+    }
+  }
+
+  // 2. Fallback bei 404 nur mit persönlichem Key
+  if (!customKey) {
+    throw new Error('Der Gemini-Server-Proxy (/api/gemini) ist nicht erreichbar.');
+  }
+
+  const candidateModels = cachedWorkingModel
+    ? [cachedWorkingModel, ...TRUSTED_MODELS.filter((m) => m !== cachedWorkingModel)]
+    : TRUSTED_MODELS;
+
   let lastError = null;
-
   for (const model of candidateModels) {
-    for (const version of apiVersions) {
-      const endpoint = `https://generativelanguage.googleapis.com/${version}/models/${model}:generateContent?key=${key}`;
-      
-      try {
-        const response = await fetch(endpoint, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            contents: [
-              {
-                role: 'user',
-                parts: [{ text: `${systemInstruction}\n\n${prompt}` }]
-              }
-            ],
-            generationConfig: {
-              temperature,
-              responseMimeType: 'application/json'
-            }
-          })
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          const candidateText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (candidateText) {
-            cachedWorkingModel = model;
-            cachedApiVersion = version;
-            return { candidateText, modelUsed: model, versionUsed: version };
-          }
-        } else {
-          const errData = await response.json().catch(() => ({}));
-          const errMsg = errData.error?.message || `HTTP ${response.status}`;
-          lastError = new Error(errMsg);
-
-          // Invalid API Key: abort loop immediately
-          if (response.status === 400 && (errMsg.includes('API_KEY_INVALID') || errMsg.includes('key not valid'))) {
-            throw new Error('Der eingegebene Gemini API-Schlüssel ist ungültig. Bitte prüfe den Schlüssel in den Optionen.');
-          }
-
-          console.warn(`[Gemini] ${model} (${version}) fehlgeschlagen: ${errMsg}`);
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(customKey)}`;
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ role: 'user', parts: [{ text: `${systemInstruction}\n\n${prompt}` }] }],
+          generationConfig: { temperature, responseMimeType: 'application/json' },
+        }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        const candidateText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (candidateText) {
+          cachedWorkingModel = model;
+          return { candidateText, modelUsed: model, versionUsed: 'v1beta' };
         }
-      } catch (e) {
-        lastError = e;
-        if (e.message?.includes('ungültig')) {
-          throw e;
+      } else {
+        const errData = await response.json().catch(() => ({}));
+        const errMsg = errData.error?.message || `HTTP ${response.status}`;
+        lastError = new Error(errMsg);
+        if (response.status === 400 && (errMsg.includes('API_KEY_INVALID') || errMsg.includes('key not valid'))) {
+          throw new Error('Der eingegebene Gemini API-Schlüssel ist ungültig. Bitte prüfe den Schlüssel in den Optionen.');
         }
       }
+    } catch (e) {
+      lastError = e;
+      if (e.message?.includes('ungültig')) throw e;
     }
   }
 
@@ -144,33 +102,9 @@ async function executeGeminiRequest({ key, systemInstruction, prompt, temperatur
 }
 
 export const geminiService = {
-  // Live end-to-end test of the API key
-  async testConnection(key) {
-    if (!key || !key.trim()) {
-      throw new Error('Bitte zuerst einen API-Schlüssel eintragen.');
-    }
-    const cleanKey = key.trim();
-
-    // 1. Fetch models list
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${cleanKey}`);
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.error?.message || `API-Schlüssel ungültig (${res.status})`);
-    }
-
-    const data = await res.json();
-    const allModels = data.models || [];
-    const validModels = allModels.filter(m => 
-      m.supportedGenerationMethods?.includes('generateContent') &&
-      !m.name.includes('8b') &&
-      !m.name.includes('2.5')
-    );
-
-    if (validModels.length === 0) {
-      throw new Error('Kein Modell für Textgenerierung (generateContent) gefunden.');
-    }
-
-    // 2. Perform real test inference with the best model
+  // Live end-to-end test via Proxy (oder optional mit persönlichem Key)
+  async testConnection(key = '') {
+    const cleanKey = (key || '').trim();
     const testResult = await executeGeminiRequest({
       key: cleanKey,
       systemInstruction: 'Du bist ein KI-Tester. Antworte als JSON: {"status": "ok"}',
@@ -182,16 +116,12 @@ export const geminiService = {
       success: true,
       activeModel: testResult.modelUsed,
       version: testResult.versionUsed,
-      availableCount: validModels.length,
+      availableCount: TRUSTED_MODELS.length,
     };
   },
 
   async translate({ text, sourceLang, targetLang, simplified = false, pedagogicalTone = 'student', isSpokenInput = false, apiKey = '' }) {
-    const key = apiKey || import.meta.env.VITE_GEMINI_API_KEY || '';
-    
-    if (!key) {
-      throw new Error('Kein Gemini API-Schlüssel hinterlegt. Bitte in den Optionen eintragen.');
-    }
+    const key = (apiKey || '').trim();
 
     const sourceObj = getLanguage(sourceLang);
     const targetObj = getLanguage(targetLang);
@@ -261,10 +191,7 @@ Gib deine Antwort AUSSCHLIESSLICH als valides JSON in folgendem Format zurück:
   },
 
   async polishAndTranslateParentLetter({ germanDraft, targetLang = 'uk', apiKey = '' }) {
-    const key = apiKey || import.meta.env.VITE_GEMINI_API_KEY || '';
-    if (!key) {
-      throw new Error('Kein Gemini API-Schlüssel hinterlegt. Bitte in den Optionen eintragen.');
-    }
+    const key = (apiKey || '').trim();
 
     const targetObj = getLanguage(targetLang);
     const targetName = targetObj?.name || targetLang;

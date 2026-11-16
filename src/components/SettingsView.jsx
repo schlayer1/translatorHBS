@@ -159,7 +159,6 @@ export default function SettingsView({ isForcedOffline, onToggleForceOffline, on
   };
 
   const handleTestConnection = async () => {
-    if (!apiKey.trim()) return;
     setIsTesting(true);
     setTestResult(null);
     try {
@@ -169,8 +168,9 @@ export default function SettingsView({ isForcedOffline, onToggleForceOffline, on
         message: 'Verbindung zu Google Gemini erfolgreich!',
         model: res.activeModel,
       });
-      // Automatically save the verified key
-      storageService.saveSettings({ apiKey: apiKey.trim() });
+      if (apiKey.trim()) {
+        storageService.saveSettings({ apiKey: apiKey.trim() });
+      }
     } catch (e) {
       setTestResult({
         success: false,
